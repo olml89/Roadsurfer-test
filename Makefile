@@ -1,19 +1,21 @@
+DOCKER_COMPOSE = docker-compose -f docker/docker-compose.yml --env-file .env.local
+
 .PHONY: build
 build:
-	docker-compose -f docker/docker-compose.yml build
+	$(DOCKER_COMPOSE) build
 
 .PHONY: upd
 upd:
-	docker-compose -f docker/docker-compose.yml up -d --remove-orphans
+	$(DOCKER_COMPOSE) -f docker/docker-compose.yml up -d --remove-orphans
 
 .PHONY: down
 down:
-	docker-compose -f docker/docker-compose.yml down
+	$(DOCKER_COMPOSE) -f docker/docker-compose.yml down
 
 .PHONY: ssh
 ssh:
-	docker-compose -f docker/docker-compose.yml exec php /bin/sh
+	$(DOCKER_COMPOSE) -f docker/docker-compose.yml exec php /bin/sh
 
 .PHONY: test
 test:
-	docker-compose -f docker/docker-compose.yml exec php ./bin/phpunit
+	$(DOCKER_COMPOSE) -f docker/docker-compose.yml exec php ./bin/phpunit

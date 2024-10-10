@@ -3,6 +3,10 @@ services:
   php:
     build:
       dockerfile: Dockerfile
+      args:
+        XDEBUG_PORT: ${XDEBUG_PORT}
+    environment:
+      PHP_IDE_CONFIG: "serverName=${PHP_SERVER_NAME}"
     tty: true
     volumes:
       - ../:/app
