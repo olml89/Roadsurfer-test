@@ -1,0 +1,10 @@
+name: roadsurfer-test
+services:
+  php:
+    build:
+      dockerfile: Dockerfile
+    tty: true
+    volumes:
+      - ../:/app
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
