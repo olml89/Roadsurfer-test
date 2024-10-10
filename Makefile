@@ -13,3 +13,7 @@ down:
 .PHONY: ssh
 ssh:
 	docker-compose -f docker/docker-compose.yml exec php /bin/sh
+
+.PHONY: test
+test:
+	docker-compose -f docker/docker-compose.yml exec php ./bin/phpunit
