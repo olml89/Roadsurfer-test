@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Tests\Unit\Edible\Domain;
+
+use App\Edible\Quantity;
+use App\Shared\Domain\Unit;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\TestCase;
+
+#[CoversClass(Quantity::class)]
+final class QuantityTest extends TestCase
+{
+    public static function provideQuantityAndExpectedConversion(): array
+    {
+        return [
+            'kg to kg' => [
+                new Quantity(2, Unit::kg),
+                Unit::kg,
+                2,
+            ],
+            'kg to gr' => [
+                new Quantity(2, Unit::kg),
+                Unit::g,
+                2000,
+            ],
+            'gr to gr' => [
+                new Quantity(100, Unit::g),
+                Unit::g,
+                100,
+            ],
+            'gr to kg' => [
+                new Quantity(500, Unit::g),
+                Unit::kg,
+                0.5,
+            ],
+        ];
+    }
+
+    #[DataProvider('provideQuantityAndExpectedConversion')]
+    public function testItDoesCorrectConversions(Quantity $quantity, Unit $convertTo, float $expectedAmount): void
+    {
+        $conversion = $quantity->convertTo($convertTo);
+
+        $this->assertSame($expectedAmount, $conversion->amount);
+    }
+}
