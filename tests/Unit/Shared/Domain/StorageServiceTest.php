@@ -1,8 +1,10 @@
 <?php
 
-namespace App\Tests\App\Service;
+declare(strict_types=1);
 
-use App\Service\StorageService;
+namespace App\Tests\Unit\Shared\Domain;
+
+use App\Shared\Domain\StorageService;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
