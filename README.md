@@ -6,7 +6,9 @@
 </p>
 
 This is an implementation of a technical test for a senior developer role at
-**[Roadsurfer](https://roadsurfer.com)**
+**[Roadsurfer](https://roadsurfer.com)**.
+You can find the original repository this test is based on here:
+[https://github.com/tturkowski/fruits-and-vegetables](https://github.com/tturkowski/fruits-and-vegetables).
 
 # 🍎🥕 Fruits and Vegetables
 
