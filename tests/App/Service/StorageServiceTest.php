@@ -3,8 +3,10 @@
 namespace App\Tests\App\Service;
 
 use App\Service\StorageService;
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
+#[CoversClass(StorageService::class)]
 class StorageServiceTest extends TestCase
 {
     public function testReceivingRequest(): void

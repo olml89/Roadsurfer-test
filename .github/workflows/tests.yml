@@ -1,0 +1,31 @@
+name: Tests
+
+on: [push]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3.4.0
+
+      - name: Install composer and dependencies
+        uses: php-actions/composer@v6
+
+      - name: Run PHPUnit
+        uses: php-actions/phpunit@v3
+        env:
+          XDEBUG_MODE: coverage
+        with:
+          bootstrap: vendor/autoload.php
+          configuration: phpunit.xml.dist
+          php_extensions: xdebug
+          args: tests --coverage-clover ./coverage.xml
+          test_suffix: Test.php
+
+      - name: Upload to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage.xml
+          verbose: true

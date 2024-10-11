@@ -1,3 +1,13 @@
+<p align="center"><a href="https://roadsurfer.com/" target="_blank"><img src="https://roadsurfer.com/wp-content/uploads/roadsurfer-logo.jpg" width="400" alt="Roadsurfer"></a></p>
+
+<p align="center">
+<a href="https://github.com/olml89/Roadsurfer-test"><img src="https://github.com/olml89/Roadsurfer-test/actions/workflows/tests.yml/badge.svg" alt="Tests"></a>
+<a href="https://codecov.io/gh/olml89/Roadsurfer-test"><img src="https://codecov.io/gh/olml89/Roadsurfer-test/branch/main/graph/badge.svg?token=SL6ANXRH0A" alt="Coverage status"></a>
+</p>
+
+This is an implementation of a technical test for a senior developer role at
+**[Roadsurfer](https://roadsurfer.com)**
+
 # 🍎🥕 Fruits and Vegetables
 
 ## 🎯 Goal
