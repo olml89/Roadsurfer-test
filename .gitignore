@@ -17,3 +17,7 @@
 ###> custom ###
 .idea
 ###< custom ###
+
+###> phpstan/phpstan ###
+phpstan.neon
+###< phpstan/phpstan ###

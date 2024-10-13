@@ -15,6 +15,7 @@
         "symfony/yaml": "7.1.*"
     },
     "require-dev": {
+        "phpstan/phpstan": "^1.12",
         "phpunit/phpunit": "^11",
         "symfony/browser-kit": "7.1.*",
         "symfony/css-selector": "7.1.*",

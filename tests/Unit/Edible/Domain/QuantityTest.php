@@ -13,6 +13,9 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass(Quantity::class)]
 final class QuantityTest extends TestCase
 {
+    /**
+     * @return array<string, array{Quantity, Unit, float}>
+     */
     public static function provideQuantityAndExpectedConversion(): array
     {
         return [

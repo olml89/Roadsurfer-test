@@ -24,10 +24,6 @@ enum Unit: string
 
     public function multiplierTo(Unit $unit): float
     {
-        return self::CONVERSIONS[$this->name][$unit->name] ?? throw new InvalidArgumentException(sprintf(
-            'Conversion from %s to %s not supported',
-            $this->name,
-            $unit->name,
-        ));
+        return self::CONVERSIONS[$this->name][$unit->name];
     }
 }

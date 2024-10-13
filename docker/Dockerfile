@@ -12,6 +12,6 @@ RUN install-php-extensions zip bcmath xdebug @composer; \
 # Override XDebug with the environment provided one
 ARG XDEBUG_PORT
 COPY ./php/conf.d/xdebug.ini /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
-RUN echo "xdebug.client_port=${XDEBUG_PORT}" >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
+RUN printf '\nxdebug.client_port=%s\n' ${XDEBUG_PORT} >> /usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
 
 WORKDIR /app

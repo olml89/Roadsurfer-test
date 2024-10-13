@@ -13,7 +13,7 @@ class StorageServiceTest extends TestCase
 {
     public function testReceivingRequest(): void
     {
-        $request = file_get_contents('request.json');
+        $request = (string)file_get_contents('request.json');
 
         $storageService = new StorageService($request);
 
