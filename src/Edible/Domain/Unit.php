@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Shared\Domain;
+namespace App\Edible\Domain;
 
 enum Unit: string
 {

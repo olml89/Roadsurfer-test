@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Edible;
+namespace App\Edible\Domain;
 
 abstract class Edible
 {

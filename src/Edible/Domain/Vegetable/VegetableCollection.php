@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Edible\Vegetable;
+namespace App\Edible\Domain\Vegetable;
 
 use App\Shared\Domain\Collection;
 use App\Shared\Domain\CollectionWrapper;

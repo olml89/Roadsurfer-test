@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Edible\Domain;
 
-use App\Edible\Quantity;
-use App\Shared\Domain\Unit;
+use App\Edible\Domain\Quantity;
+use App\Edible\Domain\Unit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;

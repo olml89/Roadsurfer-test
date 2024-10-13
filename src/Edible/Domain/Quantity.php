@@ -2,9 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Edible;
-
-use App\Shared\Domain\Unit;
+namespace App\Edible\Domain;
 
 final readonly class Quantity implements Convertible
 {

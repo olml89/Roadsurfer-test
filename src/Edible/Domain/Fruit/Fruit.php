@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace App\Edible\Fruit;
+namespace App\Edible\Domain\Fruit;
 
-use App\Edible\Edible;
-use App\Edible\Quantity;
-use App\Edible\Type;
+use App\Edible\Domain\Edible;
+use App\Edible\Domain\Quantity;
+use App\Edible\Domain\Type;
 
 final class Fruit extends Edible
 {
