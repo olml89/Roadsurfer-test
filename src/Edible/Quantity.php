@@ -16,6 +16,6 @@ final readonly class Quantity implements Convertible
 
     public function convertTo(Unit $unit): self
     {
-        return new self($this->amount * $this->unit->multiplierTo($unit), $unit);
+        return new self(amount: $this->amount * $this->unit->multiplierTo($unit), unit: $unit);
     }
 }

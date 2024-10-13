@@ -8,9 +8,11 @@ use App\Edible\Quantity;
 use App\Shared\Domain\Unit;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Quantity::class)]
+#[UsesClass(Unit::class)]
 final class QuantityTest extends TestCase
 {
     /**
