@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Edible\Domain;
 
+use App\Edible\Domain\Fruit\Fruit;
+use App\Edible\Domain\Vegetable\Vegetable;
+
 abstract class Edible
 {
     protected ?int $id = null;
@@ -16,6 +19,14 @@ abstract class Edible
         $this->name = $name;
         $this->type = $type;
         $this->quantity = $quantity;
+    }
+
+    public static function from(Type $type, string $name, Quantity $quantity): self
+    {
+        return match ($type) {
+            Type::Fruit => new Fruit($name, $quantity),
+            Type::Vegetable => new Vegetable($name, $quantity),
+        };
     }
 
     public function getId(): ?int

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Edible\Domain\Fruit;
 
-use App\Shared\Domain\Collection;
-use App\Shared\Domain\CollectionWrapper;
+use App\Shared\Domain\Collection\Collection;
+use App\Shared\Domain\Collection\CollectionWrapper;
 
 final class FruitCollection
 {

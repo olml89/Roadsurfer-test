@@ -4,8 +4,12 @@ declare(strict_types=1);
 
 namespace App\Edible\Domain;
 
+use App\Shared\Domain\EnumValues;
+
 enum Unit: string
 {
+    use EnumValues;
+
     case kg = 'kg';
     case g = 'g';
 

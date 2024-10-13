@@ -2,14 +2,14 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Shared\Domain;
+namespace App\Tests\Unit\Shared\Domain\Collection;
 
-use App\Shared\Domain\Collection;
+use App\Shared\Domain\Collection\Collection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 #[CoversClass(Collection::class)]
-final class CollectionsTest extends TestCase
+final class CollectionTest extends TestCase
 {
     /**
      * @var Collection<int>
