@@ -18,6 +18,7 @@ final class NotValidatedEdibleFactory implements EdibleFactory
     public function create(array $data): Edible
     {
         return Edible::from(
+            id: $data['id'],
             type: Type::from($data['type']),
             name: $data['name'],
             quantity: new Quantity($data['quantity'], Unit::from($data['unit'])),

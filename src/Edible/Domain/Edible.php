@@ -14,18 +14,19 @@ abstract class Edible
     protected Type $type;
     protected Quantity $quantity;
 
-    public function __construct(string $name, Type $type, Quantity $quantity)
+    public function __construct(int $id, string $name, Type $type, Quantity $quantity)
     {
+        $this->id = $id;
         $this->name = $name;
         $this->type = $type;
         $this->quantity = $quantity;
     }
 
-    public static function from(Type $type, string $name, Quantity $quantity): self
+    public static function from(int $id, Type $type, string $name, Quantity $quantity): self
     {
         return match ($type) {
-            Type::Fruit => new Fruit($name, $quantity),
-            Type::Vegetable => new Vegetable($name, $quantity),
+            Type::Fruit => new Fruit($id, $name, $quantity),
+            Type::Vegetable => new Vegetable($id, $name, $quantity),
         };
     }
 

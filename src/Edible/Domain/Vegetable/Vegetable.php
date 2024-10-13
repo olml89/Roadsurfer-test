@@ -10,9 +10,10 @@ use App\Edible\Domain\Type;
 
 final class Vegetable extends Edible
 {
-    public function __construct(string $name, Quantity $quantity)
+    public function __construct(int $id, string $name, Quantity $quantity)
     {
         parent::__construct(
+            id: $id,
             name: $name,
             type: Type::Vegetable,
             quantity: $quantity,
