@@ -6,8 +6,10 @@ namespace App\Edible\Domain;
 
 use App\Edible\Domain\Fruit\Fruit;
 use App\Edible\Domain\Fruit\FruitCollection;
+use App\Edible\Domain\Fruit\FruitRepository;
 use App\Edible\Domain\Vegetable\Vegetable;
 use App\Edible\Domain\Vegetable\VegetableCollection;
+use App\Edible\Domain\Vegetable\VegetableRepository;
 use App\Shared\Domain\DataProvider\DataProvider;
 use App\Shared\Domain\DataProvider\UnreachableDataException;
 use UnexpectedValueException;
@@ -17,6 +19,8 @@ final readonly class Importer
     public function __construct(
         private DataProvider $dataProvider,
         private EdibleFactory $edibleFactory,
+        private FruitRepository $fruitRepository,
+        private VegetableRepository $vegetableRepository,
     ) {}
 
     /**
@@ -40,6 +44,9 @@ final readonly class Importer
                 )),
             };
         }
+
+        $this->fruitRepository->save($fruitCollection);
+        $this->vegetableRepository->save($vegetableCollection);
 
         return $fruitCollection->count() + $vegetableCollection->count();
     }

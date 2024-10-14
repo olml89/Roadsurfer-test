@@ -6,7 +6,7 @@ RUN apk add --no-cache git
 # Install PHP extensions
 COPY --from=mlocati/php-extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
-RUN install-php-extensions zip bcmath xdebug @composer; \
+RUN install-php-extensions zip bcmath pdo_mysql xdebug @composer; \
     rm /usr/local/bin/install-php-extensions;
 
 # Override XDebug with the environment provided one

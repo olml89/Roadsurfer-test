@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Unit\Edible\Domain;
+namespace App\Tests\Unit\Edible\Domain\Fixtures;
 
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;

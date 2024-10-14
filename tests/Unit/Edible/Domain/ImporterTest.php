@@ -14,6 +14,10 @@ use App\Edible\Domain\Unit;
 use App\Edible\Domain\Vegetable\Vegetable;
 use App\Edible\Domain\Vegetable\VegetableCollection;
 use App\Shared\Domain\Collection\Collection;
+use App\Tests\Unit\Edible\Domain\Fixtures\ArrayDataProvider;
+use App\Tests\Unit\Edible\Domain\Fixtures\InMemoryFruitRepository;
+use App\Tests\Unit\Edible\Domain\Fixtures\InMemoryVegetableRepository;
+use App\Tests\Unit\Edible\Domain\Fixtures\NotValidatedEdibleFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -32,7 +36,7 @@ final class ImporterTest extends TestCase
     /**
      * @return array<string, array<array<array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>}>>>
      */
-    public static function provideEdibleFeedAndExpectedImportedCount(): array
+    public static function provideEdibleFeed(): array
     {
         return [
             'empty feed' => [
@@ -62,16 +66,61 @@ final class ImporterTest extends TestCase
     /**
      * @param array<array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>}> $edibleFeed
      */
-    #[DataProvider('provideEdibleFeedAndExpectedImportedCount')]
+    #[DataProvider('provideEdibleFeed')]
     public function testItReturnsCountOfImportedEdibles(array $edibleFeed): void
     {
         $importer = new Importer(
             dataProvider: new ArrayDataProvider($edibleFeed),
             edibleFactory: new NotValidatedEdibleFactory(),
+            fruitRepository: $fruitRepository = new InMemoryFruitRepository(),
+            vegetableRepository: $vegetableRepository = new InMemoryVegetableRepository(),
         );
+
+        $expectedFruit = $edibleFeed[0];
+        $expectedVegetable = $edibleFeed[1];
 
         $count = $importer->import('fake_file.json');
 
         $this->assertEquals(count($edibleFeed), $count);
+
+        if (!is_null($expectedFruit)) {
+            $this->assertNotNull($fruit = $fruitRepository->get($expectedFruit['id']));
+            $this->assertEquals(
+                $expectedFruit['id'],
+                $fruit->getId()
+            );
+            $this->assertEquals(
+                $expectedFruit['name'],
+                $fruit->getName()
+            );
+            $this->assertEquals(
+                $expectedFruit['quantity'],
+                $fruit->getQuantity()->amount
+            );
+            $this->assertEquals(
+                $expectedFruit['unit'],
+                $fruit->getQuantity()->unit->value
+            );
+        }
+
+        if (!is_null($expectedVegetable)) {
+            $this->assertNotNull($vegetable = $vegetableRepository->get($expectedVegetable['id']));
+            $this->assertEquals(
+                $expectedVegetable['id'],
+                $vegetable->getId()
+            );
+            $this->assertEquals(
+                $expectedVegetable['name'],
+                $vegetable->getName()
+            );
+            $this->assertEquals(
+                $edibleFeed[1]['quantity'],
+                $vegetable->getQuantity()->amount
+            );
+            $this->assertEquals(
+                $expectedVegetable['unit'],
+                $vegetable->getQuantity()->unit->value
+            );
+        }
     }
 }

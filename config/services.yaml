@@ -17,9 +17,13 @@ services:
         resource: '../src/'
         exclude:
             - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+            - '../src/Edible/Edible.php'
+            - '../src/Edible/Fruit/Fruit.php'
+            - '../src/Edible/Vegetable/Vegetable.php'
+            - '../src/Shared/Infrastructure/Http/Kernel.php'
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
     App\Edible\Domain\Validator: '@App\Edible\Infrastructure\SymfonyValidator'
+    App\Edible\Domain\Fruit\FruitRepository: '@App\Edible\Infrastructure\Doctrine\Fruit\DoctrineFruitRepository'
+    App\Edible\Domain\Vegetable\VegetableRepository: '@App\Edible\Infrastructure\Doctrine\Vegetable\DoctrineVegetableRepository'

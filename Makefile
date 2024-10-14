@@ -19,3 +19,7 @@ ssh:
 .PHONY: test
 test:
 	$(DOCKER_COMPOSE) -f docker/docker-compose.yml exec php ./bin/phpunit
+
+.PHONY: phpstan
+phpstan:
+	$(DOCKER_COMPOSE) -f docker/docker-compose.yml exec php ./vendor/bin/phpstan

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-mapping xmlns="https://doctrine-project.org/schemas/orm/doctrine-mapping"
+                  xmlns:xsi="https://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="https://doctrine-project.org/schemas/orm/doctrine-mapping
+                          https://www.doctrine-project.org/schemas/orm/doctrine-mapping.xsd"
+>
+    <mapped-superclass name="App\Edible\Domain\Edible">
+        <indexes>
+            <index name="idx_id"
+                   columns="id"
+            />
+        </indexes>
+        <id name="id"
+            column="id"
+            type="integer"
+        />
+        <field name="name"
+               column="name"
+               type="string"
+               length="255"
+        />
+        <field name="type"
+               column="type"
+               type="edibleType"
+               length="50"
+        />
+        <embedded name="quantity"
+                  column="quantity"
+                  class="App\Edible\Domain\Quantity"
+        />
+    </mapped-superclass>
+</doctrine-mapping>

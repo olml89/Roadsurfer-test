@@ -12,3 +12,21 @@ services:
       - ../:/app
     extra_hosts:
       - 'host.docker.internal:host-gateway'
+    networks:
+      - roadsurfer-network
+  mysql:
+    image: mysql:9
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - ${DB_PORT}:3306
+    volumes:
+      - ../var/db:/var/lib/mysql
+      - ./docker/mysql/mysql.cnf:/etc/mysql/conf.d/mysql.cnf
+    networks:
+      - roadsurfer-network
+networks:
+  roadsurfer-network:
