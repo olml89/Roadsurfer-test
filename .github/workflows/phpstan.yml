@@ -3,8 +3,13 @@ name: PHPStan
 on: [push]
 
 jobs:
-  unit-tests:
+  phpstan:
     runs-on: ubuntu-latest
+    env:
+      DB_HOST: ${{ secrets.DB_NAME }}
+      DB_NAME: ${{ secrets.DB_NAME }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3.4.0
