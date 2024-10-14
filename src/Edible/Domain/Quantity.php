@@ -4,16 +4,24 @@ declare(strict_types=1);
 
 namespace App\Edible\Domain;
 
-final readonly class Quantity implements Convertible
+final readonly class Quantity
 {
-    public function __construct(
-        public float $amount,
-        public Unit $unit,
-    ) {
+    public int $amount;
+    public Unit $unit;
+
+    public function __construct(int|float $amount, Unit $unit)
+    {
+        $this->amount = intval($amount * $unit->multiplierTo($unit->lower()));
+        $this->unit = $unit->lower();
     }
 
-    public function convertTo(Unit $unit): self
+    public function format(?Unit $convertTo = null): string
     {
-        return new self(amount: $this->amount * $this->unit->multiplierTo($unit), unit: $unit);
+
+        return sprintf(
+            '%s %s',
+            $this->amount * $this->unit->multiplierTo($convertTo ?? $this->unit),
+            $convertTo?->value ?? $this->unit->value,
+        );
     }
 }

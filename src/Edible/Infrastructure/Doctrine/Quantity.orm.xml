@@ -7,9 +7,7 @@
     <embeddable name="App\Edible\Domain\Quantity">
         <field name="amount"
                column="amount"
-               type="decimal"
-               precision="8"
-               scale="3"
+               type="integer"
         />
         <field name="unit"
                column="unit"

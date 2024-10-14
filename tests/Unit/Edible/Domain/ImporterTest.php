@@ -94,12 +94,8 @@ final class ImporterTest extends TestCase
                 $fruit->getName()
             );
             $this->assertEquals(
-                $expectedFruit['quantity'],
-                $fruit->getQuantity()->amount
-            );
-            $this->assertEquals(
-                $expectedFruit['unit'],
-                $fruit->getQuantity()->unit->value
+                sprintf('%s %s', $expectedFruit['quantity'], $expectedFruit['unit']),
+                $fruit->getQuantity()->format(Unit::from($expectedFruit['unit']))
             );
         }
 
@@ -114,12 +110,8 @@ final class ImporterTest extends TestCase
                 $vegetable->getName()
             );
             $this->assertEquals(
-                $edibleFeed[1]['quantity'],
-                $vegetable->getQuantity()->amount
-            );
-            $this->assertEquals(
-                $expectedVegetable['unit'],
-                $vegetable->getQuantity()->unit->value
+                sprintf('%s %s', $expectedVegetable['quantity'], $expectedVegetable['unit']),
+                $vegetable->getQuantity()->format(Unit::from($expectedVegetable['unit']))
             );
         }
     }

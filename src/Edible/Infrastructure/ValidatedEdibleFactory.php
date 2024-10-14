@@ -12,7 +12,6 @@ use App\Edible\Domain\EdibleFactory;
 use App\Shared\Domain\Validation\ValidationError;
 use App\Shared\Domain\Validation\ValidationException;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 

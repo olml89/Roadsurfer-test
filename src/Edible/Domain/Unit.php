@@ -24,6 +24,11 @@ enum Unit: string
         ],
     ];
 
+    public function lower(): self
+    {
+        return self::g;
+    }
+
     public function multiplierTo(Unit $unit): float
     {
         return self::CONVERSIONS[$this->name][$unit->name];
