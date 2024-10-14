@@ -33,14 +33,7 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
 
     protected function setUp(): void
     {
-        self::bootKernel();
-
         $this->factory = $this->get(ValidatedEdibleFactory::class);
-    }
-
-    protected function tearDown(): void
-    {
-        restore_exception_handler();
     }
 
     /**

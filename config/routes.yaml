@@ -1,3 +1,7 @@
 kernel:
     resource: ../src/Shared/Infrastructure/Http/Kernel.php
     type: attribute
+
+edibleControllers:
+    resource: ../src/Edible/Infrastructure/Http
+    type: attribute

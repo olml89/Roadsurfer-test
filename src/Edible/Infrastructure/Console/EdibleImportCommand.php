@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Edible\Infrastructure;
+namespace App\Edible\Infrastructure\Console;
 
 use App\Edible\Domain\Importer;
 use JsonException;
@@ -13,11 +13,11 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 #[AsCommand(
-    name: 'app:import-edibles',
-    description: 'Import edibles from a json file.',
+    name: 'app:edible:import',
+    description: 'Import edibles from a specified json file.',
     hidden: false,
 )]
-final class ImportEdiblesCommand extends Command
+final class EdibleImportCommand extends Command
 {
     private readonly Importer $importer;
 

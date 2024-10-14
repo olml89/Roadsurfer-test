@@ -10,14 +10,21 @@ use App\Edible\Domain\Vegetable\VegetableRepository;
 
 final class InMemoryVegetableRepository implements VegetableRepository
 {
-    /**
-     * @var array<int, Vegetable>
-     */
-    private array $vegetables;
+    private VegetableCollection $vegetables;
+
+    public function __construct()
+    {
+        $this->vegetables = new VegetableCollection();
+    }
+
+    public function all(): VegetableCollection
+    {
+        return $this->vegetables;
+    }
 
     public function get(int $id): ?Vegetable
     {
-        foreach ($this->vegetables as $vegetable) {
+        foreach ($this->vegetables->list() as $vegetable) {
             if ($vegetable->getId() === $id) {
                 return $vegetable;
             }
@@ -29,11 +36,7 @@ final class InMemoryVegetableRepository implements VegetableRepository
     public function save(Vegetable|VegetableCollection $vegetable): void
     {
         $vegetable instanceof Vegetable
-            ? $this->vegetables[] = $vegetable
-            : $vegetable->each(
-                function (Vegetable $vegetable): void {
-                    $this->vegetables[] = $vegetable;
-                }
-            );
+            ? $this->vegetables->add($vegetable)
+            : $this->vegetables->add(...$vegetable->list());
     }
 }

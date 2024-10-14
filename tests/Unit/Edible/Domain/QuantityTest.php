@@ -16,7 +16,7 @@ use PHPUnit\Framework\TestCase;
 final class QuantityTest extends TestCase
 {
     /**
-     * @return array<string, array{Quantity, Unit, string}>
+     * @return array<string, array{Quantity, int, Unit}>
      */
     public static function provideQuantityAndExpectedAmountAndUnit(): array
     {

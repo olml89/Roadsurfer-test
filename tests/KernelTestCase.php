@@ -31,4 +31,11 @@ abstract class KernelTestCase extends BaseKernelTestCase
     {
         return Kernel::class;
     }
+
+    protected function tearDown(): void
+    {
+        parent::tearDown();
+
+        restore_exception_handler();
+    }
 }

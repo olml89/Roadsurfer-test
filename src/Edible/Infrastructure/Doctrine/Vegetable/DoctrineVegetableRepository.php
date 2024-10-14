@@ -15,6 +15,13 @@ final readonly class DoctrineVegetableRepository implements VegetableRepository
         private EntityManagerInterface $entityManager,
     ) {}
 
+    public function all(): VegetableCollection
+    {
+        return new VegetableCollection(
+            ...$this->entityManager->getRepository(Vegetable::class)->findAll()
+        );
+    }
+
     public function get(int $id): ?Vegetable
     {
         return $this->entityManager->getRepository(Vegetable::class)->find($id);

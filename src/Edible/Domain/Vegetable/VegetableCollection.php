@@ -4,19 +4,16 @@ declare(strict_types=1);
 
 namespace App\Edible\Domain\Vegetable;
 
-use App\Shared\Domain\Collection\Collection;
 use App\Shared\Domain\Collection\CollectionWrapper;
 
-final class VegetableCollection
+/**
+ * @extends CollectionWrapper<Vegetable>
+ */
+final class VegetableCollection extends CollectionWrapper
 {
-    /**
-     * @use CollectionWrapper<Vegetable>
-     */
-    use CollectionWrapper;
-
     public function __construct(Vegetable ...$items)
     {
-        $this->collection = new Collection($items);
+        parent::__construct($items);
     }
 
     public function add(Vegetable ...$items): self

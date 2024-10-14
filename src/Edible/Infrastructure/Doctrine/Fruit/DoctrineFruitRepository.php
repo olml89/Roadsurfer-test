@@ -15,6 +15,13 @@ final readonly class DoctrineFruitRepository implements FruitRepository
         private EntityManagerInterface $entityManager,
     ) {}
 
+    public function all(): FruitCollection
+    {
+        return new FruitCollection(
+            ...$this->entityManager->getRepository(Fruit::class)->findAll()
+        );
+    }
+
     public function get(int $id): ?Fruit
     {
         return $this->entityManager->getRepository(Fruit::class)->find($id);

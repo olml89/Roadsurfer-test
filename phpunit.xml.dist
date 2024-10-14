@@ -36,7 +36,11 @@
       <extensions>
           <extension class="Symfony\Component\Panther\ServerExtension" />
       </extensions>
-      -->
+    -->
+
+    <extensions>
+        <bootstrap class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension" />
+    </extensions>
 
     <source ignoreIndirectDeprecations="true"
             restrictNotices="true"

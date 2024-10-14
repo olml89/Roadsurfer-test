@@ -10,14 +10,22 @@ use Closure;
 /**
  * @template T
  */
-trait CollectionWrapper
+abstract class CollectionWrapper
 {
     /**
      * @var Collection<T>
      */
     protected Collection $collection;
 
-    public function clear(): self
+    /**
+     * @param array<array-key, T> $items
+     */
+    public function __construct(array $items)
+    {
+        $this->collection = new Collection($items);
+    }
+
+    public function clear(): static
     {
         $this->collection->clear();
 
@@ -32,7 +40,7 @@ trait CollectionWrapper
     /**
      * @param Closure(T): void $callback
      */
-    public function each(Closure $callback): self
+    public function each(Closure $callback): static
     {
         $this->collection->each($callback);
 
@@ -42,9 +50,9 @@ trait CollectionWrapper
     /**
      * @param Closure(T, array-key): bool $callable
      */
-    public function filter(Closure $callable): self
+    public function filter(Closure $callable): static
     {
-        $this->collection->filter($callable);
+        $this->collection = $this->collection->filter($callable);
 
         return $this;
     }
@@ -64,12 +72,11 @@ trait CollectionWrapper
 
     /**
      * @param Closure(T): mixed $callable
+     * @return Collection<mixed>
      */
-    public function map(Closure $callable): self
+    public function map(Closure $callable): Collection
     {
-        $this->collection->map($callable);
-
-        return $this;
+        return $this->collection->map($callable);
     }
 
     /**
@@ -85,16 +92,26 @@ trait CollectionWrapper
     /**
      * @param array-key $index
      */
-    public function removeAt(int|string $index): self
+    public function removeAt(int|string $index): static
     {
         $this->collection->removeAt($index);
 
         return $this;
     }
 
-    public function values(): self
+    /**
+     * @param Closure(T): mixed $callable
+     */
+    public function transform(Closure $callable): static
     {
-        $this->collection->values();
+        $this->collection->transform($callable);
+
+        return $this;
+    }
+
+    public function values(): static
+    {
+        $this->collection = $this->collection->values();
 
         return $this;
     }

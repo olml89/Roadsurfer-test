@@ -31,6 +31,7 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass(Fruit::class)]
 #[UsesClass(Vegetable::class)]
 #[UsesClass(Quantity::class)]
+#[UsesClass(Unit::class)]
 final class ImporterTest extends TestCase
 {
     /**
