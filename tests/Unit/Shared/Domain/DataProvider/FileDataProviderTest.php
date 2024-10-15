@@ -6,14 +6,14 @@ namespace App\Tests\Unit\Shared\Domain\DataProvider;
 
 use App\Shared\Domain\DataProvider\FileDataProvider;
 use App\Shared\Domain\DataProvider\UnreachableDataException;
+use App\Tests\KernelTestCase;
 use JsonException;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
-use PHPUnit\Framework\TestCase;
 
 #[CoversClass(FileDataProvider::class)]
 #[UsesClass(UnreachableDataException::class)]
-final class FileDataProviderTest extends TestCase
+final class FileDataProviderTest extends KernelTestCase
 {
     private const string FIXTURES = __DIR__ . '/Fixtures';
 
@@ -55,7 +55,7 @@ final class FileDataProviderTest extends TestCase
 
     public function testItParsesValidFeedJsonFile(): void
     {
-        $validFeed = $this->fileDataProvider->getData('/app/request.json');
+        $validFeed = $this->fileDataProvider->getData($this->bootKernel()->getProjectDir() . '/request.json');
 
         $this->assertCount(20, $validFeed);
     }

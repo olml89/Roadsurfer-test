@@ -24,14 +24,13 @@ use Symfony\Component\Validator\Constraints as Assert;
 final readonly class ListEdibleRequestDto
 {
     public function __construct(
-        #[Assert\Optional(
-            new Assert\Type('string'),
-        )]
+        #[Assert\Type('string')]
         public ?string $name = null,
 
-        #[Assert\Optional(
-            new Assert\Choice([Type::AND, Type::OR]),
-        )]
+        #[Assert\Choice([
+            Type::AND,
+            Type::OR,
+        ])]
         public Type $op = Type::AND,
 
         #[Assert\Valid]

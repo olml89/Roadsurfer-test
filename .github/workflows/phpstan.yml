@@ -19,3 +19,6 @@ jobs:
 
       - name: Run PHPStan checks
         uses: php-actions/phpstan@v3
+        with:
+          configuration: /app/phpstan.dist.neon
+          version: composer

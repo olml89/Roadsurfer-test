@@ -11,32 +11,29 @@ use Symfony\Component\Validator\Constraints as Assert;
 final class QuantityDto
 {
     public function __construct(
-        #[Assert\Optional(
-            new Assert\AtLeastOneOf([
-                new Assert\Type('numeric'),
-                new Assert\Type('string'),
-            ]),
-        )]
+        #[Assert\AtLeastOneOf([
+            new Assert\Type('numeric'),
+            new Assert\Type('string'),
+        ])]
         public null|int|float|string $amount,
 
-        #[Assert\Optional(
-            new Assert\Choice([
-                Operator::LTE,
-                Operator::LT,
-                Operator::EQ,
-                Operator::NEQ,
-                Operator::GTE,
-                Operator::GT,
-                Operator::IN,
-                Operator::NIN,
-                Operator::LIKE,
-            ]),
-        )]
+        #[Assert\Choice([
+            Operator::LTE,
+            Operator::LT,
+            Operator::EQ,
+            Operator::NEQ,
+            Operator::GTE,
+            Operator::GT,
+            Operator::IN,
+            Operator::NIN,
+            Operator::LIKE,
+        ])]
         public Operator $op = Operator::EQ,
 
-        #[Assert\Optional(
-            new Assert\Choice([Unit::g, Unit::kg]),
-        )]
+        #[Assert\Choice([
+            Unit::g,
+            Unit::kg,
+        ])]
         public Unit $unit = Unit::g,
     ) {
     }

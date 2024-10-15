@@ -6,7 +6,7 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     env:
-      DB_HOST: ${{ secrets.DB_NAME }}
+      DB_HOST: ${{ secrets.DB_HOST }}
       DB_NAME: ${{ secrets.DB_NAME }}
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
@@ -14,19 +14,28 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3.4.0
 
+      - name: Set up Mysql
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          host port: 3306
+          mysql database: ${{ env.DB_NAME }}
+          mysql user: ${{ env.DB_USER }}
+          mysql password: ${{ env.DB_PASSWORD }}
+
+      - name: Set up PHP 8.3
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: xdebug, pdo, pdo_mysql
+
       - name: Install composer and dependencies
         uses: php-actions/composer@v6
 
+      - name: Run database migrations
+        run: ./bin/console doctrine:migrations:migrate --no-interaction
+          
       - name: Run PHPUnit
-        uses: php-actions/phpunit@v3
-        env:
-          XDEBUG_MODE: coverage
-        with:
-          bootstrap: vendor/autoload.php
-          configuration: phpunit.xml.dist
-          php_extensions: xdebug
-          args: tests --coverage-clover ./coverage.xml
-          test_suffix: Test.php
+        run: ./bin/phpunit --coverage-clover ./coverage.xml
 
       - name: Upload to Codecov
         uses: codecov/codecov-action@v3

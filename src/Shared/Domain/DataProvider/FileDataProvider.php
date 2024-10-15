@@ -4,17 +4,11 @@ declare(strict_types=1);
 
 namespace App\Shared\Domain\DataProvider;
 
-use ErrorException;
 use JsonException;
 use Throwable;
 
 final class FileDataProvider implements DataProvider
 {
-    public function __construct()
-    {
-
-    }
-
     /**
      * @return array<array<string, mixed>>
      * @throws UnreachableDataException
@@ -42,7 +36,7 @@ final class FileDataProvider implements DataProvider
         catch (JsonException $e) {
             throw UnreachableDataException::invalidJson($e);
         }
-        catch (Throwable $e) {
+        catch (Throwable) {
             throw UnreachableDataException::invalidSource($source);
         }
     }
