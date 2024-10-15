@@ -17,7 +17,6 @@ final readonly class Quantity
 
     public function format(?Unit $convertTo = null): string
     {
-
         return sprintf(
             '%s %s',
             $this->amount * $this->unit->multiplierTo($convertTo ?? $this->unit),

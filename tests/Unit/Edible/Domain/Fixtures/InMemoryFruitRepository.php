@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Edible\Domain\Fixtures;
 
+use App\Edible\Domain\EdibleSpecification;
 use App\Edible\Domain\Fruit\Fruit;
 use App\Edible\Domain\Fruit\FruitCollection;
 use App\Edible\Domain\Fruit\FruitRepository;
@@ -17,9 +18,13 @@ final class InMemoryFruitRepository implements FruitRepository
         $this->fruits = new FruitCollection();
     }
 
-    public function all(): FruitCollection
+    public function search(?EdibleSpecification $specification): FruitCollection
     {
-        return $this->fruits;
+        return is_null($specification)
+            ? $this->fruits
+            : $this->fruits->filter(
+                fn(Fruit $fruit): bool => $specification->isSatisfiedBy($fruit)
+            );
     }
 
     public function get(int $id): ?Fruit

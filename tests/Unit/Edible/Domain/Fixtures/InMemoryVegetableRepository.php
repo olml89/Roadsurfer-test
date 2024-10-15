@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Edible\Domain\Fixtures;
 
+use App\Edible\Domain\EdibleSpecification;
 use App\Edible\Domain\Vegetable\Vegetable;
 use App\Edible\Domain\Vegetable\VegetableCollection;
 use App\Edible\Domain\Vegetable\VegetableRepository;
@@ -17,9 +18,13 @@ final class InMemoryVegetableRepository implements VegetableRepository
         $this->vegetables = new VegetableCollection();
     }
 
-    public function all(): VegetableCollection
+    public function search(?EdibleSpecification $specification): VegetableCollection
     {
-        return $this->vegetables;
+        return is_null($specification)
+            ? $this->vegetables
+            : $this->vegetables->filter(
+                fn(Vegetable $vegetable): bool => $specification->isSatisfiedBy($vegetable)
+            );
     }
 
     public function get(int $id): ?Vegetable

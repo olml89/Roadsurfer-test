@@ -9,10 +9,9 @@ use App\Edible\Domain\Quantity;
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
 use App\Edible\Domain\EdibleFactory;
-use App\Shared\Domain\Validation\ValidationError;
-use App\Shared\Domain\Validation\ValidationException;
+use App\Shared\Domain\ValidationException;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ConstraintViolationListInterface;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 final readonly class ValidatedEdibleFactory implements EdibleFactory
@@ -52,8 +51,15 @@ final readonly class ValidatedEdibleFactory implements EdibleFactory
 
         $errors = $this->validator->validate($data, $constraints);
 
+        // Wrap the Symfony ValidationFailedException with our domain ValidationException
         if (count($errors) > 0) {
-            throw $this->createValidationException($errors);
+            throw new ValidationException(
+                message: (string)$errors,
+                previous: new ValidationFailedException(
+                    value: $data,
+                    violations: $errors,
+                ),
+            );
         }
 
         /** @var array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>} $data */
@@ -63,19 +69,5 @@ final readonly class ValidatedEdibleFactory implements EdibleFactory
             name: $data['name'],
             quantity: new Quantity($data['quantity'], Unit::from($data['unit'])),
         );
-    }
-
-    private function createValidationException(ConstraintViolationListInterface $violations): ValidationException
-    {
-        $validationErrors = [];
-
-        foreach ($violations as $violation) {
-            $validationErrors[] = new ValidationError(
-                property: $violation->getPropertyPath(),
-                message: (string)$violation->getMessage(),
-            );
-        }
-
-        return new ValidationException((string)$violations, ...$validationErrors);
     }
 }

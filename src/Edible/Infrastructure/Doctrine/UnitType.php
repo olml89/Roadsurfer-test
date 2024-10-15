@@ -25,6 +25,10 @@ final class UnitType extends StringType
      */
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): string
     {
+        if (is_string($value)) {
+            return $value;
+        }
+
         if (!($value instanceof Unit)) {
             throw InvalidType::new(
                 value: $value,

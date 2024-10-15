@@ -9,15 +9,35 @@ use App\Edible\Domain\Fruit\Fruit;
 use App\Edible\Domain\Fruit\FruitCollection;
 use App\Edible\Domain\Fruit\FruitRepository;
 use App\Edible\Domain\Quantity;
+use App\Edible\Domain\Specification\EdibleAndSpecification;
+use App\Edible\Domain\Specification\EdibleOrSpecification;
+use App\Edible\Domain\Specification\NameContains;
+use App\Edible\Domain\Specification\QuantityComparesTo;
 use App\Edible\Domain\Unit;
 use App\Edible\Infrastructure\Doctrine\EdibleTypeType;
 use App\Edible\Infrastructure\Doctrine\Fruit\DoctrineFruitRepository;
 use App\Edible\Infrastructure\Doctrine\UnitType;
-use App\Edible\Infrastructure\Http\ListFruitController;
+use App\Edible\Infrastructure\Http\List\ListEdibleRequestDto;
+use App\Edible\Infrastructure\Http\List\ListFruitController;
+use App\Edible\Infrastructure\Http\List\QuantityDto;
 use App\Shared\Domain\Collection\Collection;
+use App\Shared\Domain\Criteria\CompositeExpression\AndExpression;
+use App\Shared\Domain\Criteria\CompositeExpression\CompositeExpression;
+use App\Shared\Domain\Criteria\CompositeExpression\OrExpression;
+use App\Shared\Domain\Criteria\CompositeExpression\Type;
+use App\Shared\Domain\Criteria\Criteria;
+use App\Shared\Domain\Criteria\Filter\EqualTo;
+use App\Shared\Domain\Criteria\Filter\Filter;
+use App\Shared\Domain\Criteria\Filter\GreaterThanOrEqualTo;
+use App\Shared\Domain\Criteria\Filter\In;
+use App\Shared\Domain\Criteria\Filter\LessThanOrEqualTo;
+use App\Shared\Domain\Criteria\Filter\Like;
+use App\Shared\Domain\Criteria\Filter\Operator;
 use App\Shared\Infrastructure\Collection\CollectionWrapperNormalizer;
+use App\Shared\Infrastructure\Doctrine\DoctrineCriteriaConverter;
 use App\Tests\KernelTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Response;
@@ -34,46 +54,290 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[UsesClass(EdibleTypeType::class)]
 #[UsesClass(UnitType::class)]
 #[UsesClass(CollectionWrapperNormalizer::class)]
+#[UsesClass(EdibleAndSpecification::class)]
+#[UsesClass(EdibleOrSpecification::class)]
+#[UsesClass(NameContains::class)]
+#[UsesClass(QuantityComparesTo::class)]
+#[UsesClass(ListEdibleRequestDto::class)]
+#[UsesClass(QuantityDto::class)]
+#[UsesClass(CompositeExpression::class)]
+#[UsesClass(AndExpression::class)]
+#[UsesClass(OrExpression::class)]
+#[UsesClass(Criteria::class)]
+#[UsesClass(Filter::class)]
+#[UsesClass(Operator::class)]
+#[UsesClass(EqualTo::class)]
+#[UsesClass(GreaterThanOrEqualTo::class)]
+#[UsesClass(LessThanOrEqualTo::class)]
+#[UsesClass(In::class)]
+#[UsesClass(Like::class)]
+#[UsesClass(DoctrineCriteriaConverter::class)]
 final class ListFruitsTest extends KernelTestCase
 {
-    private FruitRepository $fruitRepository;
+    private const string METHOD = 'GET';
+    private const string ENDPOINT = '/fruits';
+
     private KernelBrowser $client;
     private SerializerInterface $serializer;
+    private FruitCollection $fruits;
 
     protected function setUp(): void
     {
         $this->client = new KernelBrowser(self::bootKernel());
-        $this->fruitRepository = $this->get(FruitRepository::class);
         $this->serializer = $this->get(SerializerInterface::class);
-    }
 
-    public function testItListsFruits(): void
-    {
-        $fruits = new FruitCollection(
-            new Fruit(
-                id: 1,
-                name: 'Bananas',
-                quantity: new Quantity(amount: 3, unit: Unit::kg),
-            ),
+        $this->fruits = new FruitCollection(
             new Fruit(
                 id: 2,
+                name: 'Apples',
+                quantity: new Quantity(amount: 20000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 3,
+                name: 'Pears',
+                quantity: new Quantity(amount: 3500, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 4,
+                name: 'Melons',
+                quantity: new Quantity(amount: 120000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 8,
+                name: 'Berries',
+                quantity: new Quantity(amount: 10000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 14,
+                name: 'Bananas',
+                quantity: new Quantity(amount: 100000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 15,
                 name: 'Oranges',
-                quantity: new Quantity(amount: 5.5, unit: Unit::kg),
+                quantity: new Quantity(amount: 24000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 16,
+                name: 'Avocado',
+                quantity: new Quantity(amount: 10000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 17,
+                name: 'Lettuce',
+                quantity: new Quantity(amount: 20830, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 18,
+                name: 'Kiwi',
+                quantity: new Quantity(amount: 10000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 19,
+                name: 'Kumquat',
+                quantity: new Quantity(amount: 90000, unit: Unit::g),
             ),
         );
 
-        $this->fruitRepository->save($fruits);
+        $this->get(FruitRepository::class)->save($this->fruits);
+    }
 
-        $this
-            ->client
-            ->request('GET', '/fruits');
+    /**
+     * @return array<string, empty|array{0: array<string, mixed>}|array{0: array<string, mixed>, 1: FruitCollection}>>
+     */
+    public static function provideExpectedFruits(): array
+    {
+        return [
+            'no filters' => [
+
+            ],
+            'name filter' => [
+                [
+                    'name' => 'B',
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 8,
+                        name: 'Berries',
+                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 14,
+                        name: 'Bananas',
+                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            // Not passing a valid amount will make quantity filter not being taken into consideration
+            'quantity filter without amount' => [
+                [
+                    'quantity' => [
+                        'op' => Operator::LTE->value,
+                        'unit' => Unit::kg->value,
+                    ],
+                ],
+            ],
+            // This assumes a comparison for the exact value (EQ operator by default)
+            'quantity filter without operator' => [
+                [
+                    'quantity' => [
+                        'amount' => 24000,
+                    ],
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 15,
+                        name: 'Oranges',
+                        quantity: new Quantity(amount: 24000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'quantity filter with operator' => [
+                [
+                    'quantity' => [
+                        'amount' => 24000,
+                        'op' => Operator::GTE->value,
+                    ],
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 4,
+                        name: 'Melons',
+                        quantity: new Quantity(amount: 120000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 14,
+                        name: 'Bananas',
+                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 15,
+                        name: 'Oranges',
+                        quantity: new Quantity(amount: 24000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 19,
+                        name: 'Kumquat',
+                        quantity: new Quantity(amount: 90000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'quantity filter with unit' => [
+                [
+                    'quantity' => [
+                        'amount' => 10,
+                        'op' => Operator::LTE->value,
+                        'unit' => Unit::kg->value,
+                    ],
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 3,
+                        name: 'Pears',
+                        quantity: new Quantity(amount: 3500, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 8,
+                        name: 'Berries',
+                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 16,
+                        name: 'Avocado',
+                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 18,
+                        name: 'Kiwi',
+                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'name and quantity filters' => [
+                [
+                    'name' => 'B',
+                    'quantity' => [
+                        'amount' => 50,
+                        'op' => Operator::GTE->value,
+                        'unit' => Unit::kg->value,
+                    ],
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 14,
+                        name: 'Bananas',
+                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'quantity amount with a composite value' => [
+                [
+                    'quantity' => [
+                        'amount' => '100,120',
+                        'op' => Operator::IN->value,
+                        'unit' => Unit::kg->value,
+                    ],
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 4,
+                        name: 'Melons',
+                        quantity: new Quantity(amount: 120000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 14,
+                        name: 'Bananas',
+                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'name and quantity filters joined by an OR operator' => [
+                [
+                    'name' => 'B',
+                    'op' => Type::OR->value,
+                    'quantity' => [
+                        'amount' => 3.5,
+                        'unit' => Unit::kg->value,
+                    ],
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 3,
+                        name: 'Pears',
+                        quantity: new Quantity(amount: 3500, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 8,
+                        name: 'Berries',
+                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                    ),
+                    new Fruit(
+                        id: 14,
+                        name: 'Bananas',
+                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                    ),
+                ),
+            ],
+        ];
+    }
+
+    /**
+     * @param array<string, mixed> $queryString
+     */
+    #[DataProvider('provideExpectedFruits')]
+    public function testItListsFruits(array $queryString = [], ?FruitCollection $expectedFruits = null): void
+    {
+        $this->client->request(
+            method: self::METHOD,
+            uri: count($queryString) === 0 ? self::ENDPOINT : self::ENDPOINT . '?' . http_build_query($queryString)
+        );
 
         $response = $this->client->getResponse();
 
         $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
 
         $this->assertEquals(
-            $this->serializer->serialize($fruits, 'json'),
+            $this->serializer->serialize($expectedFruits ?? $this->fruits, 'json'),
             $response->getContent(),
         );
     }

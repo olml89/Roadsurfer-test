@@ -11,12 +11,13 @@ use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
 use App\Edible\Domain\Vegetable\Vegetable;
 use App\Edible\Infrastructure\ValidatedEdibleFactory;
-use App\Shared\Domain\Validation\ValidationError;
-use App\Shared\Domain\Validation\ValidationException;
+use App\Shared\Domain\ValidationException;
 use App\Tests\KernelTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Exception\ValidationFailedException;
 
 #[CoversClass(ValidatedEdibleFactory::class)]
 #[UsesClass(Type::class)]
@@ -26,7 +27,7 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(Fruit::class)]
 #[UsesClass(Vegetable::class)]
 #[UsesClass(ValidationException::class)]
-#[UsesClass(ValidationError::class)]
+#[UsesClass(ConstraintViolation::class)]
 final class ValidatedEdibleFactoryTest extends KernelTestCase
 {
     private ValidatedEdibleFactory $factory;
@@ -55,8 +56,20 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
         ];
     }
 
+    private static function createConstraintViolation(string $property, string $message): ConstraintViolation
+    {
+        return new ConstraintViolation(
+            message: $message,
+            messageTemplate: null,
+            parameters: [],
+            root: null,
+            propertyPath: $property,
+            invalidValue: null,
+        );
+    }
+
     /**
-     * @return array<string, array{array<'id'|'name'|'quantity'|'type'|'unit'|'extra_field', mixed>, ValidationError}>
+     * @return array<string, array{array<'id'|'name'|'quantity'|'type'|'unit'|'extra_field', mixed>, ConstraintViolation}>
      */
     public static function provideInvalidInputAndExpectedException(): array
     {
@@ -66,28 +79,28 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
                     self::createEdibleData(),
                     array_flip(['id']),
                 ),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[id]',
                     message: 'This field is missing.',
                 ),
             ],
             'id is blank' => [
                 self::createEdibleData(id: ''),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[id]',
                     message: 'This value should not be blank.',
                 ),
             ],
             'id is not an integer' => [
                 self::createEdibleData(id: 3.1416),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[id]',
                     message: 'This value should be of type integer.',
                 ),
             ],
             'id is not positive' => [
                 self::createEdibleData(id: -1),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[id]',
                     message: 'This value should be positive.',
                 ),
@@ -97,14 +110,14 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
                     self::createEdibleData(),
                     array_flip(['name']),
                 ),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[name]',
                     message: 'This field is missing.',
                 ),
             ],
             'name is blank' => [
                 self::createEdibleData(name: ''),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[name]',
                     message: 'This value should not be blank.',
                 ),
@@ -114,21 +127,21 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
                     self::createEdibleData(),
                     array_flip(['type']),
                 ),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[type]',
                     message: 'This field is missing.',
                 ),
             ],
             'type is blank' => [
                 self::createEdibleData(type: ''),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[type]',
                     message: 'This value should not be blank.',
                 ),
             ],
             'type is not valid' => [
                 self::createEdibleData(type: 'type'),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[type]',
                     message: 'The value you selected is not a valid choice.',
                 ),
@@ -138,28 +151,28 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
                     self::createEdibleData(),
                     array_flip(['quantity']),
                 ),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[quantity]',
                     message: 'This field is missing.',
                 ),
             ],
             'quantity is blank' => [
                 self::createEdibleData(quantity: false),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[quantity]',
                     message: 'This value should not be blank.',
                 ),
             ],
             'quantity is not numeric' => [
                 self::createEdibleData(quantity: 'six'),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[quantity]',
                     message: 'This value should be of type numeric.',
                 ),
             ],
             'quantity is not positive' => [
                 self::createEdibleData(quantity: -12.5),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[quantity]',
                     message: 'This value should be positive.',
                 ),
@@ -169,21 +182,21 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
                     self::createEdibleData(),
                     array_flip(['unit']),
                 ),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[unit]',
                     message: 'This field is missing.',
                 ),
             ],
             'unit is blank' => [
                 self::createEdibleData(unit: false),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[unit]',
                     message: 'This value should not be blank.',
                 ),
             ],
             'unit is not valid' => [
                 self::createEdibleData(unit: 'unit'),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[unit]',
                     message: 'The value you selected is not a valid choice.',
                 ),
@@ -195,7 +208,7 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
                         'extra_field' => 'random',
                     ],
                 ),
-                new ValidationError(
+                self::createConstraintViolation(
                     property: '[extra_field]',
                     message: 'This field was not expected.',
                 )
@@ -207,13 +220,25 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
      * @param array<'id'|'name'|'quantity'|'type'|'unit', mixed> $data
      */
     #[DataProvider('provideInvalidInputAndExpectedException')]
-    public function testItThrowsUnexpectedValueExceptionOnInvalidInput(array $data, ValidationError $validationError): void
+    public function testItThrowsUnexpectedValueExceptionOnInvalidInput(array $data, ConstraintViolation $expectedConstraintViolation): void
     {
         try {
             $this->factory->create($data);
         }
         catch (ValidationException $e) {
-            $this->assertEquals($validationError, $e->validationErrors()[0]);
+            $previous = $e->getPrevious();
+            $this->assertInstanceOf(
+                ValidationFailedException::class,
+                $previous,
+            );
+            $this->assertEquals(
+                $expectedConstraintViolation->getPropertyPath(),
+                $previous->getViolations()->get(0)->getPropertyPath()
+            );
+            $this->assertEquals(
+                $expectedConstraintViolation->getMessage(),
+                $previous->getViolations()->get(0)->getMessage()
+            );
         }
     }
 

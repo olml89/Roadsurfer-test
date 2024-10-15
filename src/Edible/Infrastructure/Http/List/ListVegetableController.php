@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Edible\Infrastructure\Http;
+namespace App\Edible\Infrastructure\Http\List;
 
 use App\Edible\Domain\Vegetable\VegetableRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 
 final class ListVegetableController extends AbstractController
@@ -16,11 +16,11 @@ final class ListVegetableController extends AbstractController
         private readonly VegetableRepository $vegetableRepository,
     ) {}
 
-    #[Route('vegetables', name: 'list_vegetables')]
-    public function __invoke(Request $request): JsonResponse
+    #[Route('vegetables', name: 'list_vegetables', methods: ['GET'])]
+    public function __invoke(#[MapQueryString] ?ListEdibleRequestDto $listRequestDto): JsonResponse
     {
         return $this->json(
-            $this->vegetableRepository->all()->list(),
+            $this->vegetableRepository->search($listRequestDto?->specification()),
         );
     }
 }
