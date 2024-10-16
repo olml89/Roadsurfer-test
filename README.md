@@ -15,6 +15,12 @@ You can find the original repository this test is based on here:
 # Implementation details
 
 This application can store and show lists of edibles separated into two different collections: fruits and vegetables.
+<br>
+<br>
+It has been developed with a domain-driven design in mind, so the bussiness core code does not contain tight couplings with
+either Symfony, Doctrine or any of the packages it uses to run.
+<br>
+<br>
 (Technical detail: although the edibles are only distinct because of their type, I have decided to consider them as
 different entities because in the future they could evolve to have different behaviours,
 I wanted to illustrate how I would make room for this from an architectural standpoint: they share a common Doctrine
@@ -148,8 +154,21 @@ GET /fruits
 GET /vegetables
 ```
 
-They will return a 200 OK HTTP response outputting the requested collection. The endpoints have filtering capabilites 
-using the following concepts:
+They will return a 200 OK HTTP response outputting the requested collection. 
+<br>
+<br>
+The endpoints have filtering capabilities that have been implemented following the **specification pattern**: there's a 
+system of classes that represent conditions that can be used to check if they are satisfied by a given edible 
+(or whatever future entity), and they can be combined in whatever way needed to form any complex matching condition needed.
+Those specifications can be used to check directly against entities (for example in a memory repository), or translated 
+to a criteria language that is not dependent on any external package and represents the logical clauses that form a condition.
+Finally, there's a bridge that translate those criteria filters into a criteria that is understood by our persistence layer, 
+in this case Doctrine, but another bridge could be built for whatever storing engine or infrastructure required, meaning that
+all the needed conditions to filter and search entities can be built in a way that is fully comprehended by the domain
+of the application without tight coupling to any third-party code.
+<br>
+<br>
+The filtering for entities uses the following concepts:
 
 ```
 name: It will try to check if an entity matches partially with it. The comparison will not be case-sensitive.
