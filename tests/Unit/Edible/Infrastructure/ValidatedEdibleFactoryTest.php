@@ -4,42 +4,23 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Edible\Infrastructure;
 
-use App\Edible\Domain\Edible;
 use App\Edible\Domain\Fruit\Fruit;
 use App\Edible\Domain\Quantity;
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
 use App\Edible\Domain\Vegetable\Vegetable;
-use App\Edible\Infrastructure\Http\Create\CreateEdibleRequestDto;
 use App\Edible\Infrastructure\ValidatedEdibleFactory;
 use App\Shared\Domain\ValidationException;
-use App\Shared\Infrastructure\Collection\CollectionWrapperNormalizer;
-use App\Shared\Infrastructure\Http\KernelExceptionEventSubscriber;
 use App\Tests\Helpers\ProvidesEdibleCreationData;
 use App\Tests\KernelTestCase;
 use InvalidArgumentException;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\UsesClass;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
 use Symfony\Component\String\ByteString;
-use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Throwable;
 
-#[CoversClass(ValidatedEdibleFactory::class)]
-#[UsesClass(Type::class)]
-#[UsesClass(Unit::class)]
-#[UsesClass(Quantity::class)]
-#[UsesClass(Edible::class)]
-#[UsesClass(Fruit::class)]
-#[UsesClass(Vegetable::class)]
-#[UsesClass(ValidationException::class)]
-#[UsesClass(ConstraintViolation::class)]
-#[UsesClass(CreateEdibleRequestDto::class)]
-#[UsesClass(CollectionWrapperNormalizer::class)]
-#[UsesClass(KernelExceptionEventSubscriber::class)]
 final class ValidatedEdibleFactoryTest extends KernelTestCase
 {
     use ProvidesEdibleCreationData;

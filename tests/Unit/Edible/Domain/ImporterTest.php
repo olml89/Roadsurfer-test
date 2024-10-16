@@ -4,34 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Edible\Domain;
 
-use App\Edible\Domain\Edible;
-use App\Edible\Domain\Fruit\Fruit;
-use App\Edible\Domain\Fruit\FruitCollection;
 use App\Edible\Domain\Importer;
-use App\Edible\Domain\Quantity;
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
-use App\Edible\Domain\Vegetable\Vegetable;
-use App\Edible\Domain\Vegetable\VegetableCollection;
-use App\Shared\Domain\Collection\Collection;
 use App\Tests\Unit\Edible\Domain\Fixtures\ArrayDataProvider;
 use App\Tests\Unit\Edible\Domain\Fixtures\InMemoryFruitRepository;
 use App\Tests\Unit\Edible\Domain\Fixtures\InMemoryVegetableRepository;
 use App\Tests\Unit\Edible\Domain\Fixtures\NotValidatedEdibleFactory;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Importer::class)]
-#[UsesClass(Collection::class)]
-#[UsesClass(FruitCollection::class)]
-#[UsesClass(VegetableCollection::class)]
-#[UsesClass(Edible::class)]
-#[UsesClass(Fruit::class)]
-#[UsesClass(Vegetable::class)]
-#[UsesClass(Quantity::class)]
-#[UsesClass(Unit::class)]
 final class ImporterTest extends TestCase
 {
     /**

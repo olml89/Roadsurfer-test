@@ -4,79 +4,16 @@ declare(strict_types=1);
 
 namespace App\Tests\Integration\Edible\List;
 
-use App\Edible\Domain\Edible;
 use App\Edible\Domain\Quantity;
-use App\Edible\Domain\Specification\EdibleAndSpecification;
-use App\Edible\Domain\Specification\EdibleOrSpecification;
-use App\Edible\Domain\Specification\NameContains;
-use App\Edible\Domain\Specification\QuantityComparesTo;
 use App\Edible\Domain\Unit;
 use App\Edible\Domain\Vegetable\Vegetable;
 use App\Edible\Domain\Vegetable\VegetableCollection;
 use App\Edible\Domain\Vegetable\VegetableRepository;
-use App\Edible\Infrastructure\Doctrine\EdibleTypeType;
-use App\Edible\Infrastructure\Doctrine\UnitType;
-use App\Edible\Infrastructure\Doctrine\Vegetable\DoctrineVegetableRepository;
-use App\Edible\Infrastructure\Http\List\ListEdibleRequestDto;
-use App\Edible\Infrastructure\Http\List\ListVegetableController;
-use App\Edible\Infrastructure\Http\List\QuantityDto;
-use App\Edible\Infrastructure\Http\UnitsConverter;
-use App\Shared\Domain\Collection\Collection;
-use App\Shared\Domain\Criteria\CompositeExpression\AndExpression;
-use App\Shared\Domain\Criteria\CompositeExpression\CompositeExpression;
-use App\Shared\Domain\Criteria\CompositeExpression\OrExpression;
 use App\Shared\Domain\Criteria\CompositeExpression\Type;
-use App\Shared\Domain\Criteria\Criteria;
-use App\Shared\Domain\Criteria\Filter\EqualTo;
-use App\Shared\Domain\Criteria\Filter\Filter;
-use App\Shared\Domain\Criteria\Filter\GreaterThan;
-use App\Shared\Domain\Criteria\Filter\GreaterThanOrEqualTo;
-use App\Shared\Domain\Criteria\Filter\In;
-use App\Shared\Domain\Criteria\Filter\LessThanOrEqualTo;
-use App\Shared\Domain\Criteria\Filter\Like;
 use App\Shared\Domain\Criteria\Filter\Operator;
-use App\Shared\Domain\ValidationException;
-use App\Shared\Infrastructure\Collection\CollectionWrapperNormalizer;
-use App\Shared\Infrastructure\Doctrine\DoctrineCriteriaConverter;
-use App\Shared\Infrastructure\Http\KernelExceptionEventSubscriber;
 use App\Tests\KernelTestCase;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\UsesClass;
 
-#[CoversClass(ListVegetableController::class)]
-#[UsesClass(Edible::class)]
-#[UsesClass(Vegetable::class)]
-#[UsesClass(VegetableCollection::class)]
-#[UsesClass(Collection::class)]
-#[UsesClass(Quantity::class)]
-#[UsesClass(Unit::class)]
-#[UsesClass(DoctrineVegetableRepository::class)]
-#[UsesClass(EdibleTypeType::class)]
-#[UsesClass(UnitType::class)]
-#[UsesClass(CollectionWrapperNormalizer::class)]
-#[UsesClass(EdibleAndSpecification::class)]
-#[UsesClass(EdibleOrSpecification::class)]
-#[UsesClass(NameContains::class)]
-#[UsesClass(QuantityComparesTo::class)]
-#[UsesClass(ListEdibleRequestDto::class)]
-#[UsesClass(QuantityDto::class)]
-#[UsesClass(CompositeExpression::class)]
-#[UsesClass(AndExpression::class)]
-#[UsesClass(OrExpression::class)]
-#[UsesClass(Criteria::class)]
-#[UsesClass(Filter::class)]
-#[UsesClass(Operator::class)]
-#[UsesClass(Like::class)]
-#[UsesClass(EqualTo::class)]
-#[UsesClass(GreaterThan::class)]
-#[UsesClass(GreaterThanOrEqualTo::class)]
-#[UsesClass(LessThanOrEqualTo::class)]
-#[UsesClass(In::class)]
-#[UsesClass(DoctrineCriteriaConverter::class)]
-#[UsesClass(ValidationException::class)]
-#[UsesClass(KernelExceptionEventSubscriber::class)]
-#[UsesClass(UnitsConverter::class)]
 final class ListVegetablesTest extends KernelTestCase
 {
     use TestsEdibleListingEndpoint;

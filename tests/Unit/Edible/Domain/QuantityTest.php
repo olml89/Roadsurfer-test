@@ -6,13 +6,9 @@ namespace App\Tests\Unit\Edible\Domain;
 
 use App\Edible\Domain\Quantity;
 use App\Edible\Domain\Unit;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
-#[CoversClass(Quantity::class)]
-#[UsesClass(Unit::class)]
 final class QuantityTest extends TestCase
 {
     /**
