@@ -9,7 +9,7 @@ use Throwable;
 
 final class ValidationException extends RuntimeException
 {
-    public function __construct(string $message, Throwable $previous)
+    public function __construct(string $message, ?Throwable $previous = null)
     {
         parent::__construct(message: $message, previous: $previous);
     }

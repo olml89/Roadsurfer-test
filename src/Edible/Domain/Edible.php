@@ -22,14 +22,6 @@ abstract class Edible
         $this->quantity = $quantity;
     }
 
-    public static function from(int $id, Type $type, string $name, Quantity $quantity): self
-    {
-        return match ($type) {
-            Type::Fruit => new Fruit($id, $name, $quantity),
-            Type::Vegetable => new Vegetable($id, $name, $quantity),
-        };
-    }
-
     public function getId(): ?int
     {
         return $this->id;

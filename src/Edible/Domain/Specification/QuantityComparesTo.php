@@ -9,7 +9,7 @@ use App\Edible\Domain\EdibleSpecification;
 use App\Edible\Domain\Quantity;
 use App\Shared\Domain\Criteria\Criteria;
 use App\Shared\Domain\Criteria\Filter\Operator;
-use InvalidArgumentException;
+use App\Shared\Domain\ValidationException;
 
 final readonly class QuantityComparesTo implements EdibleSpecification
 {
@@ -23,11 +23,11 @@ final readonly class QuantityComparesTo implements EdibleSpecification
         Quantity ...$quantities,
     ) {
         if (count($quantities) === 0) {
-            throw new InvalidArgumentException('At least one quantity must be provided.');
+            throw new ValidationException('At least one quantity must be provided.');
         }
 
         if (count($quantities) > 1 && !$this->operator->comparesMultipleValues()) {
-            throw new InvalidArgumentException(
+            throw new ValidationException(
                 sprintf(
                     'Operator %s cannot compare multiple quantities.',
                     $this->operator->value,

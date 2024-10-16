@@ -27,3 +27,7 @@ services:
     App\Edible\Domain\Validator: '@App\Edible\Infrastructure\SymfonyValidator'
     App\Edible\Domain\Fruit\FruitRepository: '@App\Edible\Infrastructure\Doctrine\Fruit\DoctrineFruitRepository'
     App\Edible\Domain\Vegetable\VegetableRepository: '@App\Edible\Infrastructure\Doctrine\Vegetable\DoctrineVegetableRepository'
+
+    App\Shared\Infrastructure\Http\KernelExceptionEventSubscriber:
+        arguments:
+            $environment: '%kernel.environment%'

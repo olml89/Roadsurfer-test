@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Integration\Edible;
+namespace App\Tests\Integration\Edible\List;
 
 use App\Edible\Domain\Edible;
 use App\Edible\Domain\Quantity;
@@ -361,7 +361,7 @@ final class ListVegetablesTest extends KernelTestCase
     #[DataProvider('provideExpectedVegetables')]
     public function testItListsVegetables(array $queryString = [], ?VegetableCollection $expectedVegetables = null): void
     {
-        $this->client->request(
+        $this->client->jsonRequest(
             method: self::METHOD,
             uri: count($queryString) === 0 ? self::ENDPOINT : self::ENDPOINT . '?' . http_build_query($queryString)
         );

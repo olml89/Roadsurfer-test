@@ -9,6 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
 
 final class ListVegetableController extends AbstractController
 {
@@ -17,8 +18,10 @@ final class ListVegetableController extends AbstractController
     ) {}
 
     #[Route('vegetables', name: 'list_vegetables', methods: ['GET'])]
-    public function __invoke(#[MapQueryString] ?ListEdibleRequestDto $listRequestDto): JsonResponse
-    {
+    public function __invoke(
+        #[MapQueryString(serializationContext: [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false])]
+        ?ListEdibleRequestDto $listRequestDto
+    ): JsonResponse {
         return $this->json(
             $this->vegetableRepository->search($listRequestDto?->specification()),
         );
