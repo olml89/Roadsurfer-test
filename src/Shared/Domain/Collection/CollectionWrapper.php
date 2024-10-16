@@ -5,13 +5,14 @@ declare(strict_types=1);
 namespace App\Shared\Domain\Collection;
 
 use Closure;
+use Countable;
 
 /**
  * https://phpstan.org/blog/whats-up-with-template-covariant
  *
  * @template-covariant T
  */
-abstract class CollectionWrapper
+abstract class CollectionWrapper implements Countable
 {
     /**
      * @var Collection<T>
