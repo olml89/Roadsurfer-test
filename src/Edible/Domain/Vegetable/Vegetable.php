@@ -13,9 +13,9 @@ final class Vegetable extends Edible
     public function __construct(int $id, string $name, Quantity $quantity)
     {
         parent::__construct(
+            type: Type::Vegetable,
             id: $id,
             name: $name,
-            type: Type::Vegetable,
             quantity: $quantity,
         );
     }

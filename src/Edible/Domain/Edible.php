@@ -9,20 +9,20 @@ use App\Edible\Domain\Vegetable\Vegetable;
 
 abstract class Edible
 {
-    protected ?int $id = null;
+    protected readonly Type $type;
+    protected readonly int $id;
     protected string $name;
-    protected Type $type;
     protected Quantity $quantity;
 
-    public function __construct(int $id, string $name, Type $type, Quantity $quantity)
+    public function __construct(Type $type, int $id, string $name, Quantity $quantity)
     {
+        $this->type = $type;
         $this->id = $id;
         $this->name = $name;
-        $this->type = $type;
         $this->quantity = $quantity;
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
