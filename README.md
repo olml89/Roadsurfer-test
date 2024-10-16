@@ -20,6 +20,77 @@ different entities because in the future they could evolve to have different beh
 I wanted to illustrate how I would make room for this from an architectural standpoint: they share a common Doctrine
 superclass but they are two full-fledged entities stored in different tables).
 
+## Installation
+
+### Run the application
+
+The application runs on a docker container, with the support of an additional mysql container for data persistence. 
+After cloning the repository, spin up the containers:
+
+```php
+make build
+make upd
+```
+
+To perform the following needed steps you can log into the php container shell:
+
+```php
+make ssh
+```
+
+Then install the needed dependencies:
+
+```php
+composer install
+```
+
+Run the needed database migrations:
+
+```php
+./bin/console doctrine:migrations:migrate --no-interaction
+```
+
+Then you can start the php integrated development server, running this from the root of the project:
+
+```php
+php -S 0.0.0.0:80 -t public
+```
+
+The application will be listening into upcoming HTTP requests. If you want to import edibles though a JSON feed, 
+after being logged into the PHP container shell, run:
+
+```php
+./bin/console app:edible:import {fileLocation}
+```
+
+Alternatively, there's a more convenient way to run the application from the outside of the container once it is installed:
+
+```php
+make listen
+```
+
+### Run tests
+
+Before running tests, the testing database and migrations have to be created. You can log into the PHP container
+to run the required commands, but there's a convenient way to do it from the outside:
+
+```php
+make reset_test_db
+```
+
+Then, also from the outside, you can run:
+
+```php
+make test
+```
+
+There's also the possibility to run PHPStan checks on the code, currently the **level 9** is enforced and
+successfully achieved:
+
+```php
+make phpstan
+```
+
 ## Store edibles
 
 ### Add edibles through a JSON request
