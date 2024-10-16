@@ -17,7 +17,11 @@ final readonly class NameContains implements EdibleSpecification
 
     public function isSatisfiedBy(Edible $edible): bool
     {
-        return str_contains($edible->getName(), $this->partialMatch);
+        // SQL LIKE matching is not case-sensitive, we are matching the same behaviour.
+        return str_contains(
+            strtolower($edible->getName()),
+            strtolower($this->partialMatch)
+        );
     }
 
     public function criteria(): Criteria

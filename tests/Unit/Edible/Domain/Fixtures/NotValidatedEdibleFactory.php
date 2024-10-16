@@ -11,13 +11,24 @@ use App\Edible\Domain\Quantity;
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
 use App\Edible\Domain\Vegetable\Vegetable;
+use App\Tests\Helpers\ProvidesEdibleCreationData;
 
 final class NotValidatedEdibleFactory implements EdibleFactory
 {
+    use ProvidesEdibleCreationData;
+
     /**
      * @param array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>} $data
      */
     public function create(array $data): Edible
+    {
+        return self::createStatic($data);
+    }
+
+    /**
+     * @param array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>} $data
+     */
+    public static function createStatic(array $data): Edible
     {
         $type = Type::from($data['type']);
 
@@ -33,5 +44,16 @@ final class NotValidatedEdibleFactory implements EdibleFactory
                 quantity: Quantity::create($data['quantity'], Unit::from($data['unit'])),
             ),
         };
+    }
+
+    public static function generate(?string $name = null, ?Quantity $quantity = null): Edible
+    {
+        /** @var array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>} $edibleData */
+        $edibleData = self::edibleData();
+        $edible = self::createStatic($edibleData);
+
+        return $edible
+            ->setName($name ?? $edible->getName())
+            ->setQuantity($quantity ?? $edible->getQuantity());
     }
 }
