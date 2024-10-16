@@ -67,7 +67,10 @@ final readonly class QuantityComparesTo implements EdibleSpecification
     public function criteria(): Criteria
     {
         $comparableAmount = in_array($this->operator, [Operator::IN, Operator::NIN])
-            ? array_map(fn(Quantity $quantity): int => $quantity->amount, $this->quantities)
+            ? array_map(
+                fn(Quantity $quantity): int|float => $quantity->amount,
+                $this->quantities
+            )
             : $this->quantities[0]->amount;
 
         return new Criteria(

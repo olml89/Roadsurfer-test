@@ -63,12 +63,12 @@ final readonly class ValidatedEdibleFactory implements EdibleFactory
                 Type::Fruit => new Fruit(
                     id: $edibleDto->id,
                     name: $edibleDto->name,
-                    quantity: new Quantity(amount: $edibleDto->quantity, unit: $edibleDto->unit),
+                    quantity: Quantity::create(amount: $edibleDto->quantity, unit: $edibleDto->unit),
                 ),
                 Type::Vegetable => new Vegetable(
                     id: $edibleDto->id,
                     name: $edibleDto->name,
-                    quantity: new Quantity(amount: $edibleDto->quantity, unit: $edibleDto->unit),
+                    quantity: Quantity::create(amount: $edibleDto->quantity, unit: $edibleDto->unit),
                 ),
             };
         }

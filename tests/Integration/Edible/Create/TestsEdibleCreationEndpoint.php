@@ -6,6 +6,7 @@ namespace App\Tests\Integration\Edible\Create;
 
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
+use App\Edible\Infrastructure\Http\UnitsConverter;
 use App\Tests\Helpers\ProvidesEdibleCreationData;
 use App\Tests\KernelTestCase;
 use App\Tests\Unit\Edible\Domain\Fixtures\NotValidatedEdibleFactory;
@@ -25,6 +26,7 @@ trait TestsEdibleCreationEndpoint
     protected KernelBrowser $client;
     protected SerializerInterface $serializer;
     protected NotValidatedEdibleFactory $edibleFactory;
+    protected UnitsConverter $unitsConverter;
 
     abstract protected function getEndpoint(): string;
 
@@ -33,6 +35,7 @@ trait TestsEdibleCreationEndpoint
         $this->client = new KernelBrowser(self::bootKernel());
         $this->serializer = $this->get(SerializerInterface::class);
         $this->edibleFactory = new NotValidatedEdibleFactory();
+        $this->unitsConverter = $this->get(UnitsConverter::class);
     }
 
     /**
@@ -135,15 +138,21 @@ trait TestsEdibleCreationEndpoint
         $this->assertEquals(Response::HTTP_UNPROCESSABLE_ENTITY, $response->getStatusCode());
     }
 
-    protected function testItCreatesEdible(Type $edibleType): void
+    protected function testItCreatesEdible(Type $edibleType, ?Unit $convertTo = null): void
     {
         /** @var array{id: int, name: string, type: value-of<Type>, quantity: float, unit: value-of<Unit>} $edibleData */
         $edibleData = self::edibleData(type: $edibleType->value);
         $expectedEdible = $this->edibleFactory->create($edibleData);
+        $uri = $this->getEndpoint();
+
+        if (!is_null($convertTo)) {
+            $uri .= '?unit=' . $convertTo->value;
+            $this->unitsConverter->convert($expectedEdible, $convertTo);
+        }
 
         $this->client->jsonRequest(
             method: 'POST',
-            uri: $this->getEndpoint(),
+            uri: $uri,
             parameters: $edibleData,
         );
 

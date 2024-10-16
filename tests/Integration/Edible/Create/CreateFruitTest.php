@@ -9,24 +9,19 @@ use App\Edible\Domain\Fruit\Fruit;
 use App\Edible\Domain\Quantity;
 use App\Edible\Domain\Type;
 use App\Edible\Domain\Unit;
-use App\Edible\Domain\Vegetable\Vegetable;
 use App\Edible\Infrastructure\Doctrine\EdibleTypeType;
 use App\Edible\Infrastructure\Doctrine\Fruit\DoctrineFruitRepository;
 use App\Edible\Infrastructure\Doctrine\UnitType;
-use App\Edible\Infrastructure\Doctrine\Vegetable\DoctrineVegetableRepository;
 use App\Edible\Infrastructure\Http\Create\CreateEdibleRequestDto;
 use App\Edible\Infrastructure\Http\Create\CreateFruitController;
+use App\Edible\Infrastructure\Http\DecidesReturnedUnitsDto;
+use App\Edible\Infrastructure\Http\UnitsConverter;
 use App\Shared\Infrastructure\Collection\CollectionWrapperNormalizer;
 use App\Shared\Infrastructure\Http\KernelExceptionEventSubscriber;
-use App\Tests\Helpers\ProvidesEdibleCreationData;
 use App\Tests\KernelTestCase;
-use App\Tests\Unit\Edible\Domain\Fixtures\NotValidatedEdibleFactory;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(CreateFruitController::class)]
 #[UsesClass(Edible::class)]
@@ -39,6 +34,8 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[UsesClass(CreateEdibleRequestDto::class)]
 #[UsesClass(CollectionWrapperNormalizer::class)]
 #[UsesClass(KernelExceptionEventSubscriber::class)]
+#[UsesClass(UnitsConverter::class)]
+#[UsesClass(DecidesReturnedUnitsDto::class)]
 final class CreateFruitTest extends KernelTestCase
 {
     use TestsEdibleCreationEndpoint;
@@ -48,8 +45,27 @@ final class CreateFruitTest extends KernelTestCase
         return '/fruits';
     }
 
-    public function testItCreatesFruit(): void
+    /**
+     * @return array<int, array<int, ?Unit>>
+     */
+    public static function provideRequestedUnitOptions(): array
     {
-        $this->testItCreatesEdible(Type::Fruit);
+        return [
+            [
+                null,
+            ],
+            [
+                Unit::g,
+            ],
+            [
+                Unit::kg,
+            ],
+        ];
+    }
+
+    #[DataProvider('provideRequestedUnitOptions')]
+    public function testItCreatesFruit(?Unit $convertTo): void
+    {
+        $this->testItCreatesEdible(Type::Fruit, $convertTo);
     }
 }

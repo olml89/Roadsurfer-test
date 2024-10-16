@@ -17,9 +17,11 @@ use App\Edible\Domain\Unit;
 use App\Edible\Infrastructure\Doctrine\EdibleTypeType;
 use App\Edible\Infrastructure\Doctrine\Fruit\DoctrineFruitRepository;
 use App\Edible\Infrastructure\Doctrine\UnitType;
+use App\Edible\Infrastructure\Http\DecidesReturnedUnitsDto;
 use App\Edible\Infrastructure\Http\List\ListEdibleRequestDto;
 use App\Edible\Infrastructure\Http\List\ListFruitController;
 use App\Edible\Infrastructure\Http\List\QuantityDto;
+use App\Edible\Infrastructure\Http\UnitsConverter;
 use App\Shared\Domain\Collection\Collection;
 use App\Shared\Domain\Criteria\CompositeExpression\AndExpression;
 use App\Shared\Domain\Criteria\CompositeExpression\CompositeExpression;
@@ -73,11 +75,10 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(DoctrineCriteriaConverter::class)]
 #[UsesClass(ValidationException::class)]
 #[UsesClass(KernelExceptionEventSubscriber::class)]
+#[UsesClass(UnitsConverter::class)]
 final class ListFruitsTest extends KernelTestCase
 {
-    use TestsEdibleListingEndpoint {
-        TestsEdibleListingEndpoint::setUp as baseSetUp;
-    }
+    use TestsEdibleListingEndpoint;
 
     protected function getEndpoint(): string
     {
@@ -101,12 +102,12 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 8,
                         name: 'Berries',
-                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 10000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 14,
                         name: 'Bananas',
-                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 100000, unit: Unit::g),
                     ),
                 ),
             ],
@@ -130,7 +131,7 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 15,
                         name: 'Oranges',
-                        quantity: new Quantity(amount: 24000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 24000, unit: Unit::g),
                     ),
                 ),
             ],
@@ -145,22 +146,22 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 4,
                         name: 'Melons',
-                        quantity: new Quantity(amount: 120000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 120000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 14,
                         name: 'Bananas',
-                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 100000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 15,
                         name: 'Oranges',
-                        quantity: new Quantity(amount: 24000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 24000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 19,
                         name: 'Kumquat',
-                        quantity: new Quantity(amount: 90000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 90000, unit: Unit::g),
                     ),
                 ),
             ],
@@ -176,22 +177,22 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 3,
                         name: 'Pears',
-                        quantity: new Quantity(amount: 3500, unit: Unit::g),
+                        quantity: Quantity::create(amount: 3500, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 8,
                         name: 'Berries',
-                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 10000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 16,
                         name: 'Avocado',
-                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 10000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 18,
                         name: 'Kiwi',
-                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 10000, unit: Unit::g),
                     ),
                 ),
             ],
@@ -208,7 +209,7 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 14,
                         name: 'Bananas',
-                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 100000, unit: Unit::g),
                     ),
                 ),
             ],
@@ -224,12 +225,12 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 4,
                         name: 'Melons',
-                        quantity: new Quantity(amount: 120000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 120000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 14,
                         name: 'Bananas',
-                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 100000, unit: Unit::g),
                     ),
                 ),
             ],
@@ -246,17 +247,43 @@ final class ListFruitsTest extends KernelTestCase
                     new Fruit(
                         id: 3,
                         name: 'Pears',
-                        quantity: new Quantity(amount: 3500, unit: Unit::g),
+                        quantity: Quantity::create(amount: 3500, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 8,
                         name: 'Berries',
-                        quantity: new Quantity(amount: 10000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 10000, unit: Unit::g),
                     ),
                     new Fruit(
                         id: 14,
                         name: 'Bananas',
-                        quantity: new Quantity(amount: 100000, unit: Unit::g),
+                        quantity: Quantity::create(amount: 100000, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'Pears converted to gr' => [
+                [
+                    'name' => 'Pears',
+                    'unit' => Unit::g->value,
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 3,
+                        name: 'Pears',
+                        quantity: Quantity::create(amount: 3500, unit: Unit::g),
+                    ),
+                ),
+            ],
+            'Pears converted to kg' => [
+                [
+                    'name' => 'Pears',
+                    'unit' => Unit::kg->value,
+                ],
+                new FruitCollection(
+                    new Fruit(
+                        id: 3,
+                        name: 'Pears',
+                        quantity: Quantity::create(amount: 3500, unit: Unit::g)->convertTo(Unit::kg),
                     ),
                 ),
             ],
@@ -273,52 +300,52 @@ final class ListFruitsTest extends KernelTestCase
             new Fruit(
                 id: 2,
                 name: 'Apples',
-                quantity: new Quantity(amount: 20000, unit: Unit::g),
+                quantity: Quantity::create(amount: 20000, unit: Unit::g),
             ),
             new Fruit(
                 id: 3,
                 name: 'Pears',
-                quantity: new Quantity(amount: 3500, unit: Unit::g),
+                quantity: Quantity::create(amount: 3500, unit: Unit::g),
             ),
             new Fruit(
                 id: 4,
                 name: 'Melons',
-                quantity: new Quantity(amount: 120000, unit: Unit::g),
+                quantity: Quantity::create(amount: 120000, unit: Unit::g),
             ),
             new Fruit(
                 id: 8,
                 name: 'Berries',
-                quantity: new Quantity(amount: 10000, unit: Unit::g),
+                quantity: Quantity::create(amount: 10000, unit: Unit::g),
             ),
             new Fruit(
                 id: 14,
                 name: 'Bananas',
-                quantity: new Quantity(amount: 100000, unit: Unit::g),
+                quantity: Quantity::create(amount: 100000, unit: Unit::g),
             ),
             new Fruit(
                 id: 15,
                 name: 'Oranges',
-                quantity: new Quantity(amount: 24000, unit: Unit::g),
+                quantity: Quantity::create(amount: 24000, unit: Unit::g),
             ),
             new Fruit(
                 id: 16,
                 name: 'Avocado',
-                quantity: new Quantity(amount: 10000, unit: Unit::g),
+                quantity: Quantity::create(amount: 10000, unit: Unit::g),
             ),
             new Fruit(
                 id: 17,
                 name: 'Lettuce',
-                quantity: new Quantity(amount: 20830, unit: Unit::g),
+                quantity: Quantity::create(amount: 20830, unit: Unit::g),
             ),
             new Fruit(
                 id: 18,
                 name: 'Kiwi',
-                quantity: new Quantity(amount: 10000, unit: Unit::g),
+                quantity: Quantity::create(amount: 10000, unit: Unit::g),
             ),
             new Fruit(
                 id: 19,
                 name: 'Kumquat',
-                quantity: new Quantity(amount: 90000, unit: Unit::g),
+                quantity: Quantity::create(amount: 90000, unit: Unit::g),
             ),
         );
 

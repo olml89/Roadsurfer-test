@@ -88,15 +88,19 @@ final class ImporterTest extends TestCase
             $this->assertNotNull($fruit = $fruitRepository->get($expectedFruit['id']));
             $this->assertEquals(
                 $expectedFruit['id'],
-                $fruit->getId()
+                $fruit->getId(),
             );
             $this->assertEquals(
                 $expectedFruit['name'],
-                $fruit->getName()
+                $fruit->getName(),
             );
             $this->assertEquals(
-                sprintf('%s %s', $expectedFruit['quantity'], $expectedFruit['unit']),
-                $fruit->getQuantity()->format(Unit::from($expectedFruit['unit']))
+                $expectedFruit['quantity'],
+                $fruit->getQuantity()->convertTo(Unit::from($expectedFruit['unit']))->amount,
+            );
+            $this->assertEquals(
+                Unit::g,
+                $fruit->getQuantity()->unit,
             );
         }
 
@@ -111,8 +115,12 @@ final class ImporterTest extends TestCase
                 $vegetable->getName()
             );
             $this->assertEquals(
-                sprintf('%s %s', $expectedVegetable['quantity'], $expectedVegetable['unit']),
-                $vegetable->getQuantity()->format(Unit::from($expectedVegetable['unit']))
+                $expectedVegetable['quantity'],
+                $vegetable->getQuantity()->convertTo(Unit::from($expectedVegetable['unit']))->amount,
+            );
+            $this->assertEquals(
+                Unit::g,
+                $vegetable->getQuantity()->unit,
             );
         }
     }

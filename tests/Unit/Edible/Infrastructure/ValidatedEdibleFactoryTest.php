@@ -188,7 +188,7 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
         );
 
         $this->assertEquals(
-            new Quantity(amount: $edibleData['quantity'], unit: Unit::from($edibleData['unit'])),
+            Quantity::create(amount: $edibleData['quantity'], unit: Unit::from($edibleData['unit'])),
             $edible->getQuantity()
         );
     }

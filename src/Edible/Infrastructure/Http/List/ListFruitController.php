@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Edible\Infrastructure\Http\List;
 
 use App\Edible\Domain\Fruit\FruitRepository;
+use App\Edible\Infrastructure\Http\UnitsConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ final class ListFruitController extends AbstractController
 {
     public function __construct(
         private readonly FruitRepository $fruitRepository,
+        private readonly UnitsConverter $unitsConverter,
     ) {}
 
     #[Route('fruits', name: 'list_fruits', methods: ['GET'])]
@@ -24,10 +26,11 @@ final class ListFruitController extends AbstractController
             serializationContext: [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
             validationFailedStatusCode: Response::HTTP_BAD_REQUEST),
         ]
-        ?ListEdibleRequestDto $listRequestDto
+        ?ListEdibleRequestDto $listRequestDto,
     ): JsonResponse {
-        return $this->json(
-            $this->fruitRepository->search($listRequestDto?->specification()),
-        );
+        $fruits = $this->fruitRepository->search($listRequestDto?->specification());
+        $this->unitsConverter->convert($fruits, $listRequestDto?->unit);
+
+        return $this->json($fruits);
     }
 }

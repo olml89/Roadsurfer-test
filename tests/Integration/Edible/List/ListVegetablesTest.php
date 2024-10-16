@@ -20,6 +20,7 @@ use App\Edible\Infrastructure\Doctrine\Vegetable\DoctrineVegetableRepository;
 use App\Edible\Infrastructure\Http\List\ListEdibleRequestDto;
 use App\Edible\Infrastructure\Http\List\ListVegetableController;
 use App\Edible\Infrastructure\Http\List\QuantityDto;
+use App\Edible\Infrastructure\Http\UnitsConverter;
 use App\Shared\Domain\Collection\Collection;
 use App\Shared\Domain\Criteria\CompositeExpression\AndExpression;
 use App\Shared\Domain\Criteria\CompositeExpression\CompositeExpression;
@@ -75,11 +76,10 @@ use PHPUnit\Framework\Attributes\UsesClass;
 #[UsesClass(DoctrineCriteriaConverter::class)]
 #[UsesClass(ValidationException::class)]
 #[UsesClass(KernelExceptionEventSubscriber::class)]
+#[UsesClass(UnitsConverter::class)]
 final class ListVegetablesTest extends KernelTestCase
 {
-    use TestsEdibleListingEndpoint {
-        TestsEdibleListingEndpoint::setUp as baseSetUp;
-    }
+    use TestsEdibleListingEndpoint;
 
     protected function getEndpoint(): string
     {
@@ -103,27 +103,27 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 5,
                         name: 'Beans',
-                        quantity: new Quantity(amount: 65000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 65000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 6,
                         name: 'Beetroot',
-                        quantity: new Quantity(amount: 950, unit: Unit::g)
+                        quantity: Quantity::create(amount: 950, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 7,
                         name: 'Broccoli',
-                        quantity: new Quantity(amount: 3000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 3000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 11,
                         name: 'Cabbage',
-                        quantity: new Quantity(amount: 500000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 500000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 13,
                         name: 'Cucumber',
-                        quantity: new Quantity(amount: 8000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 8000, unit: Unit::g)
                     ),
                 ),
             ],
@@ -147,7 +147,7 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 12,
                         name: 'Onion',
-                        quantity: new Quantity(amount: 50000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 50000, unit: Unit::g)
                     ),
                 ),
             ],
@@ -162,22 +162,22 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 5,
                         name: 'Beans',
-                        quantity: new Quantity(amount: 65000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 65000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 11,
                         name: 'Cabbage',
-                        quantity: new Quantity(amount: 500000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 500000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 12,
                         name: 'Onion',
-                        quantity: new Quantity(amount: 50000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 50000, unit: Unit::g)
                     ),
                         new Vegetable(
                         id: 20,
                         name: 'Pepper',
-                        quantity: new Quantity(amount: 150000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 150000, unit: Unit::g)
                     ),
                 ),
             ],
@@ -193,22 +193,22 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 6,
                         name: 'Beetroot',
-                        quantity: new Quantity(amount: 950, unit: Unit::g)
+                        quantity: Quantity::create(amount: 950, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 7,
                         name: 'Broccoli',
-                        quantity: new Quantity(amount: 3000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 3000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 9,
                         name: 'Tomatoes',
-                        quantity: new Quantity(amount: 5000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 5000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 13,
                         name: 'Cucumber',
-                        quantity: new Quantity(amount: 8000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 8000, unit: Unit::g)
                     ),
                 ),
             ],
@@ -225,12 +225,12 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 5,
                         name: 'Beans',
-                        quantity: new Quantity(amount: 65000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 65000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 11,
                         name: 'Cabbage',
-                        quantity: new Quantity(amount: 500000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 500000, unit: Unit::g)
                     ),
                 ),
             ],
@@ -246,12 +246,12 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 9,
                         name: 'Tomatoes',
-                        quantity: new Quantity(amount: 5000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 5000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 13,
                         name: 'Cucumber',
-                        quantity: new Quantity(amount: 8000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 8000, unit: Unit::g)
                     ),
                 ),
             ],
@@ -269,27 +269,53 @@ final class ListVegetablesTest extends KernelTestCase
                     new Vegetable(
                         id: 1,
                         name: 'Carrot',
-                        quantity: new Quantity(amount: 10922, unit: Unit::g)
+                        quantity: Quantity::create(amount: 10922, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 6,
                         name: 'Beetroot',
-                        quantity: new Quantity(amount: 950, unit: Unit::g)
+                        quantity: Quantity::create(amount: 950, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 9,
                         name: 'Tomatoes',
-                        quantity: new Quantity(amount: 5000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 5000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 11,
                         name: 'Cabbage',
-                        quantity: new Quantity(amount: 500000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 500000, unit: Unit::g)
                     ),
                     new Vegetable(
                         id: 20,
                         name: 'Pepper',
-                        quantity: new Quantity(amount: 150000, unit: Unit::g)
+                        quantity: Quantity::create(amount: 150000, unit: Unit::g)
+                    ),
+                ),
+            ],
+            'Pepper converted to gr' => [
+                [
+                    'name' => 'Pepper',
+                    'unit' => Unit::g->value,
+                ],
+                new VegetableCollection(
+                    new Vegetable(
+                        id: 20,
+                        name: 'Pepper',
+                        quantity: Quantity::create(amount: 150000, unit: Unit::g)
+                    ),
+                ),
+            ],
+            'Pepper converted to kg' => [
+                [
+                    'name' => 'Pepper',
+                    'unit' => Unit::kg->value,
+                ],
+                new VegetableCollection(
+                    new Vegetable(
+                        id: 20,
+                        name: 'Pepper',
+                        quantity: Quantity::create(amount: 150000, unit: Unit::g)->convertTo(Unit::kg),
                     ),
                 ),
             ],
@@ -306,52 +332,52 @@ final class ListVegetablesTest extends KernelTestCase
             new Vegetable(
                 id: 1,
                 name: 'Carrot',
-                quantity: new Quantity(amount: 10922, unit: Unit::g)
+                quantity: Quantity::create(amount: 10922, unit: Unit::g)
             ),
             new Vegetable(
                 id: 5,
                 name: 'Beans',
-                quantity: new Quantity(amount: 65000, unit: Unit::g)
+                quantity: Quantity::create(amount: 65000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 6,
                 name: 'Beetroot',
-                quantity: new Quantity(amount: 950, unit: Unit::g)
+                quantity: Quantity::create(amount: 950, unit: Unit::g)
             ),
             new Vegetable(
                 id: 7,
                 name: 'Broccoli',
-                quantity: new Quantity(amount: 3000, unit: Unit::g)
+                quantity: Quantity::create(amount: 3000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 9,
                 name: 'Tomatoes',
-                quantity: new Quantity(amount: 5000, unit: Unit::g)
+                quantity: Quantity::create(amount: 5000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 10,
                 name: 'Celery',
-                quantity: new Quantity(amount: 20000, unit: Unit::g)
+                quantity: Quantity::create(amount: 20000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 11,
                 name: 'Cabbage',
-                quantity: new Quantity(amount: 500000, unit: Unit::g)
+                quantity: Quantity::create(amount: 500000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 12,
                 name: 'Onion',
-                quantity: new Quantity(amount: 50000, unit: Unit::g)
+                quantity: Quantity::create(amount: 50000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 13,
                 name: 'Cucumber',
-                quantity: new Quantity(amount: 8000, unit: Unit::g)
+                quantity: Quantity::create(amount: 8000, unit: Unit::g)
             ),
             new Vegetable(
                 id: 20,
                 name: 'Pepper',
-                quantity: new Quantity(amount: 150000, unit: Unit::g)
+                quantity: Quantity::create(amount: 150000, unit: Unit::g)
             ),
         );
 

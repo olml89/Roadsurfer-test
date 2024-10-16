@@ -25,12 +25,12 @@ final class NotValidatedEdibleFactory implements EdibleFactory
             Type::Fruit => new Fruit(
                 id: $data['id'],
                 name: $data['name'],
-                quantity: new Quantity($data['quantity'], Unit::from($data['unit'])),
+                quantity: Quantity::create($data['quantity'], Unit::from($data['unit'])),
             ),
             Type::Vegetable => new Vegetable(
                 id: $data['id'],
                 name: $data['name'],
-                quantity: new Quantity($data['quantity'], Unit::from($data['unit'])),
+                quantity: Quantity::create($data['quantity'], Unit::from($data['unit'])),
             ),
         };
     }

@@ -22,12 +22,12 @@ final class QuantityTest extends TestCase
     {
         return [
             'g' => [
-                new Quantity(amount: 200, unit: Unit::g),
+                Quantity::create(amount: 200, unit: Unit::g),
                 200,
                 Unit::g,
             ],
             'kg' => [
-                new Quantity(amount: 2.12, unit: Unit::kg),
+                Quantity::create(amount: 2.12, unit: Unit::kg),
                 2120,
                 Unit::g,
             ],
@@ -35,46 +35,46 @@ final class QuantityTest extends TestCase
     }
 
     #[DataProvider('provideQuantityAndExpectedAmountAndUnit')]
-    public function testItAlwaysGetsConvertedToTheLowestUnit(Quantity $quantity, int $expectedAmount, Unit $expectedUnit): void
+    public function testItIsCreatedConvertedToTheLowestUnit(Quantity $quantity, int $expectedAmount, Unit $expectedUnit): void
     {
         $this->assertEquals($expectedAmount, $quantity->amount);
         $this->assertEquals($expectedUnit, $quantity->unit);
     }
 
     /**
-     * @return array<string, array{Quantity, Unit, string}>
+     * @return array<string, array{Quantity, Unit, int|float}>
      */
     public static function provideQuantityAndExpectedFormat(): array
     {
         return [
             'kg to kg' => [
-                new Quantity(2, Unit::kg),
+                Quantity::create(2.32, Unit::kg),
                 Unit::kg,
-                '2 kg',
+                2.32,
             ],
             'kg to gr' => [
-                new Quantity(2, Unit::kg),
+                Quantity::create(2.32, Unit::kg),
                 Unit::g,
-                '2000 g',
+                2320,
             ],
             'gr to gr' => [
-                new Quantity(100, Unit::g),
+                Quantity::create(27732, Unit::g),
                 Unit::g,
-                '100 g',
+                27732,
             ],
             'gr to kg' => [
-                new Quantity(500, Unit::g),
+                Quantity::create(27732, Unit::g),
                 Unit::kg,
-                '0.5 kg',
+                27.732,
             ],
         ];
     }
 
     #[DataProvider('provideQuantityAndExpectedFormat')]
-    public function testItDoesCorrectFormattings(Quantity $quantity, Unit $formatTo, string $expectedFormat): void
+    public function testItCanGetConverted(Quantity $quantity, Unit $convertTo, int|float $expectedAmount): void
     {
-        $format = $quantity->format($formatTo);
+        $converted = $quantity->convertTo($convertTo);
 
-        $this->assertSame($expectedFormat, $format);
+        $this->assertSame($expectedAmount, $converted->amount);
     }
 }

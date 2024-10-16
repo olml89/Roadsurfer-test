@@ -6,21 +6,26 @@ namespace App\Edible\Domain;
 
 final readonly class Quantity
 {
-    public int $amount;
-    public Unit $unit;
+    private function __construct(
+        public int|float $amount,
+        public Unit $unit,
+    ) {}
 
-    public function __construct(int|float $amount, Unit $unit)
+    public static function create(int|float $amount, Unit $unit): self
     {
-        $this->amount = intval($amount * $unit->multiplierTo($unit->lower()));
-        $this->unit = $unit->lower();
+        return new self(
+            amount: intval($amount * $unit->multiplierTo($unit->lower())),
+            unit: $unit->lower(),
+        );
     }
 
-    public function format(?Unit $convertTo = null): string
+    public function convertTo(Unit $convertTo): self
     {
-        return sprintf(
-            '%s %s',
-            $this->amount * $this->unit->multiplierTo($convertTo ?? $this->unit),
-            $convertTo?->value ?? $this->unit->value,
+        $amount = round(num: $this->amount * $this->unit->multiplierTo($convertTo), precision: 3);
+
+        return new self(
+            amount: floor($amount) === $amount ? intval($amount) : $amount,
+            unit: $convertTo,
         );
     }
 }

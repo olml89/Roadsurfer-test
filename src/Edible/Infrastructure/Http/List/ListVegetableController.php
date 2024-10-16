@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Edible\Infrastructure\Http\List;
 
 use App\Edible\Domain\Vegetable\VegetableRepository;
+use App\Edible\Infrastructure\Http\UnitsConverter;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -16,6 +17,7 @@ final class ListVegetableController extends AbstractController
 {
     public function __construct(
         private readonly VegetableRepository $vegetableRepository,
+        private readonly UnitsConverter $unitsConverter,
     ) {}
 
     #[Route('vegetables', name: 'list_vegetables', methods: ['GET'])]
@@ -24,10 +26,11 @@ final class ListVegetableController extends AbstractController
             serializationContext: [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
             validationFailedStatusCode: Response::HTTP_BAD_REQUEST),
         ]
-        ?ListEdibleRequestDto $listRequestDto
+        ?ListEdibleRequestDto $listRequestDto,
     ): JsonResponse {
-        return $this->json(
-            $this->vegetableRepository->search($listRequestDto?->specification()),
-        );
+        $vegetables = $this->vegetableRepository->search($listRequestDto?->specification());
+        $this->unitsConverter->convert($vegetables, $listRequestDto?->unit);
+
+        return $this->json($vegetables);
     }
 }
