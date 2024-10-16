@@ -33,15 +33,14 @@ use App\Shared\Domain\Criteria\Filter\In;
 use App\Shared\Domain\Criteria\Filter\LessThanOrEqualTo;
 use App\Shared\Domain\Criteria\Filter\Like;
 use App\Shared\Domain\Criteria\Filter\Operator;
+use App\Shared\Domain\ValidationException;
 use App\Shared\Infrastructure\Collection\CollectionWrapperNormalizer;
 use App\Shared\Infrastructure\Doctrine\DoctrineCriteriaConverter;
+use App\Shared\Infrastructure\Http\KernelExceptionEventSubscriber;
 use App\Tests\KernelTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(ListFruitController::class)]
 #[UsesClass(Edible::class)]
@@ -72,74 +71,17 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[UsesClass(In::class)]
 #[UsesClass(Like::class)]
 #[UsesClass(DoctrineCriteriaConverter::class)]
+#[UsesClass(ValidationException::class)]
+#[UsesClass(KernelExceptionEventSubscriber::class)]
 final class ListFruitsTest extends KernelTestCase
 {
-    private const string METHOD = 'GET';
-    private const string ENDPOINT = '/fruits';
+    use TestsEdibleListingEndpoint {
+        TestsEdibleListingEndpoint::setUp as baseSetUp;
+    }
 
-    private KernelBrowser $client;
-    private SerializerInterface $serializer;
-    private FruitCollection $fruits;
-
-    protected function setUp(): void
+    protected function getEndpoint(): string
     {
-        $this->client = new KernelBrowser(self::bootKernel());
-        $this->serializer = $this->get(SerializerInterface::class);
-
-        $this->fruits = new FruitCollection(
-            new Fruit(
-                id: 2,
-                name: 'Apples',
-                quantity: new Quantity(amount: 20000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 3,
-                name: 'Pears',
-                quantity: new Quantity(amount: 3500, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 4,
-                name: 'Melons',
-                quantity: new Quantity(amount: 120000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 8,
-                name: 'Berries',
-                quantity: new Quantity(amount: 10000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 14,
-                name: 'Bananas',
-                quantity: new Quantity(amount: 100000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 15,
-                name: 'Oranges',
-                quantity: new Quantity(amount: 24000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 16,
-                name: 'Avocado',
-                quantity: new Quantity(amount: 10000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 17,
-                name: 'Lettuce',
-                quantity: new Quantity(amount: 20830, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 18,
-                name: 'Kiwi',
-                quantity: new Quantity(amount: 10000, unit: Unit::g),
-            ),
-            new Fruit(
-                id: 19,
-                name: 'Kumquat',
-                quantity: new Quantity(amount: 90000, unit: Unit::g),
-            ),
-        );
-
-        $this->get(FruitRepository::class)->save($this->fruits);
+        return '/fruits';
     }
 
     /**
@@ -327,18 +269,61 @@ final class ListFruitsTest extends KernelTestCase
     #[DataProvider('provideExpectedFruits')]
     public function testItListsFruits(array $queryString = [], ?FruitCollection $expectedFruits = null): void
     {
-        $this->client->jsonRequest(
-            method: self::METHOD,
-            uri: count($queryString) === 0 ? self::ENDPOINT : self::ENDPOINT . '?' . http_build_query($queryString)
+        $fruits = new FruitCollection(
+            new Fruit(
+                id: 2,
+                name: 'Apples',
+                quantity: new Quantity(amount: 20000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 3,
+                name: 'Pears',
+                quantity: new Quantity(amount: 3500, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 4,
+                name: 'Melons',
+                quantity: new Quantity(amount: 120000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 8,
+                name: 'Berries',
+                quantity: new Quantity(amount: 10000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 14,
+                name: 'Bananas',
+                quantity: new Quantity(amount: 100000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 15,
+                name: 'Oranges',
+                quantity: new Quantity(amount: 24000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 16,
+                name: 'Avocado',
+                quantity: new Quantity(amount: 10000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 17,
+                name: 'Lettuce',
+                quantity: new Quantity(amount: 20830, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 18,
+                name: 'Kiwi',
+                quantity: new Quantity(amount: 10000, unit: Unit::g),
+            ),
+            new Fruit(
+                id: 19,
+                name: 'Kumquat',
+                quantity: new Quantity(amount: 90000, unit: Unit::g),
+            ),
         );
 
-        $response = $this->client->getResponse();
+        $this->get(FruitRepository::class)->save($fruits);
 
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-
-        $this->assertEquals(
-            $this->serializer->serialize($expectedFruits ?? $this->fruits, 'json'),
-            $response->getContent(),
-        );
+        $this->testItListsEdibles($fruits, $queryString, $expectedFruits);
     }
 }

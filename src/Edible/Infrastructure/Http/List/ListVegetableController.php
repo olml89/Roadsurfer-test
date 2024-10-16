@@ -7,6 +7,7 @@ namespace App\Edible\Infrastructure\Http\List;
 use App\Edible\Domain\Vegetable\VegetableRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapQueryString;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Serializer\Normalizer\AbstractNormalizer;
@@ -19,7 +20,10 @@ final class ListVegetableController extends AbstractController
 
     #[Route('vegetables', name: 'list_vegetables', methods: ['GET'])]
     public function __invoke(
-        #[MapQueryString(serializationContext: [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false])]
+        #[MapQueryString(
+            serializationContext: [AbstractNormalizer::ALLOW_EXTRA_ATTRIBUTES => false],
+            validationFailedStatusCode: Response::HTTP_BAD_REQUEST),
+        ]
         ?ListEdibleRequestDto $listRequestDto
     ): JsonResponse {
         return $this->json(

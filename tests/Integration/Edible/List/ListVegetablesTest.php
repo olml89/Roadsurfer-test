@@ -34,15 +34,14 @@ use App\Shared\Domain\Criteria\Filter\In;
 use App\Shared\Domain\Criteria\Filter\LessThanOrEqualTo;
 use App\Shared\Domain\Criteria\Filter\Like;
 use App\Shared\Domain\Criteria\Filter\Operator;
+use App\Shared\Domain\ValidationException;
 use App\Shared\Infrastructure\Collection\CollectionWrapperNormalizer;
 use App\Shared\Infrastructure\Doctrine\DoctrineCriteriaConverter;
+use App\Shared\Infrastructure\Http\KernelExceptionEventSubscriber;
 use App\Tests\KernelTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Serializer\SerializerInterface;
 
 #[CoversClass(ListVegetableController::class)]
 #[UsesClass(Edible::class)]
@@ -74,76 +73,18 @@ use Symfony\Component\Serializer\SerializerInterface;
 #[UsesClass(LessThanOrEqualTo::class)]
 #[UsesClass(In::class)]
 #[UsesClass(DoctrineCriteriaConverter::class)]
+#[UsesClass(ValidationException::class)]
+#[UsesClass(KernelExceptionEventSubscriber::class)]
 final class ListVegetablesTest extends KernelTestCase
 {
-    private const string METHOD = 'GET';
-    private const string ENDPOINT = '/vegetables';
-    
-    private KernelBrowser $client;
-    private SerializerInterface $serializer;
-    private VegetableCollection $vegetables;
-
-    protected function setUp(): void
-    {
-        $this->client = new KernelBrowser(self::bootKernel());
-        $this->serializer = $this->get(SerializerInterface::class);
-        
-        $this->vegetables = new VegetableCollection(
-            new Vegetable(
-                id: 1,
-                name: 'Carrot',
-                quantity: new Quantity(amount: 10922, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 5,
-                name: 'Beans',
-                quantity: new Quantity(amount: 65000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 6,
-                name: 'Beetroot',
-                quantity: new Quantity(amount: 950, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 7,
-                name: 'Broccoli',
-                quantity: new Quantity(amount: 3000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 9,
-                name: 'Tomatoes',
-                quantity: new Quantity(amount: 5000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 10,
-                name: 'Celery',
-                quantity: new Quantity(amount: 20000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 11,
-                name: 'Cabbage',
-                quantity: new Quantity(amount: 500000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 12,
-                name: 'Onion',
-                quantity: new Quantity(amount: 50000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 13,
-                name: 'Cucumber',
-                quantity: new Quantity(amount: 8000, unit: Unit::g)
-            ),
-            new Vegetable(
-                id: 20,
-                name: 'Pepper',
-                quantity: new Quantity(amount: 150000, unit: Unit::g)
-            ),
-        );
-
-        $this->get(VegetableRepository::class)->save($this->vegetables);
+    use TestsEdibleListingEndpoint {
+        TestsEdibleListingEndpoint::setUp as baseSetUp;
     }
 
+    protected function getEndpoint(): string
+    {
+        return '/vegetables';
+    }
 
     /**
      * @return array<string, empty|array{0: array<string, mixed>}|array{0: array<string, mixed>, 1: VegetableCollection}>>
@@ -361,18 +302,61 @@ final class ListVegetablesTest extends KernelTestCase
     #[DataProvider('provideExpectedVegetables')]
     public function testItListsVegetables(array $queryString = [], ?VegetableCollection $expectedVegetables = null): void
     {
-        $this->client->jsonRequest(
-            method: self::METHOD,
-            uri: count($queryString) === 0 ? self::ENDPOINT : self::ENDPOINT . '?' . http_build_query($queryString)
+        $vegetables = new VegetableCollection(
+            new Vegetable(
+                id: 1,
+                name: 'Carrot',
+                quantity: new Quantity(amount: 10922, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 5,
+                name: 'Beans',
+                quantity: new Quantity(amount: 65000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 6,
+                name: 'Beetroot',
+                quantity: new Quantity(amount: 950, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 7,
+                name: 'Broccoli',
+                quantity: new Quantity(amount: 3000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 9,
+                name: 'Tomatoes',
+                quantity: new Quantity(amount: 5000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 10,
+                name: 'Celery',
+                quantity: new Quantity(amount: 20000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 11,
+                name: 'Cabbage',
+                quantity: new Quantity(amount: 500000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 12,
+                name: 'Onion',
+                quantity: new Quantity(amount: 50000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 13,
+                name: 'Cucumber',
+                quantity: new Quantity(amount: 8000, unit: Unit::g)
+            ),
+            new Vegetable(
+                id: 20,
+                name: 'Pepper',
+                quantity: new Quantity(amount: 150000, unit: Unit::g)
+            ),
         );
 
-        $response = $this->client->getResponse();
+        $this->get(VegetableRepository::class)->save($vegetables);
 
-        $this->assertEquals(Response::HTTP_OK, $response->getStatusCode());
-
-        $this->assertEquals(
-            $this->serializer->serialize($expectedVegetables ?? $this->vegetables, 'json'),
-            $response->getContent(),
-        );
+        $this->testItListsEdibles($vegetables, $queryString, $expectedVegetables);
     }
 }

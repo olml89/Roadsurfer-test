@@ -45,22 +45,26 @@ final readonly class KernelExceptionEventSubscriber implements EventSubscriberIn
             return;
         }
 
-        if ($exception instanceof ValidationException) {
+        /**
+         * A validation has failed in our implemented Factories or in the RequestPayloadValueResolver trying to fill
+         * a MapQueryString or a MapRequestPayload object.
+         *
+         * If the request is a GET, we have to output a 400 Bad Request.
+         * If the request is a POST, we have to output a 422 Unprocessable Entity.
+         */
+        if (
+            $exception instanceof ValidationException
+            || $exception instanceof ExtraAttributesException
+            || $exception instanceof InvalidArgumentException
+        ) {
+            $statusCode = $event->getRequest()->getMethod() === 'GET'
+                ? Response::HTTP_BAD_REQUEST
+                : Response::HTTP_UNPROCESSABLE_ENTITY;
+
             $event->setResponse(
                 new JsonResponse(
                     data: $this->formatResponsePayload($exception->getMessage(), $exception),
-                    status: Response::HTTP_UNPROCESSABLE_ENTITY,
-                ),
-            );
-
-            return;
-        }
-
-        if ($exception instanceof ExtraAttributesException || $exception instanceof InvalidArgumentException) {
-            $event->setResponse(
-                new JsonResponse(
-                    data: $this->formatResponsePayload($exception->getMessage(), $exception),
-                    status: Response::HTTP_UNPROCESSABLE_ENTITY,
+                    status: $statusCode,
                 ),
             );
 

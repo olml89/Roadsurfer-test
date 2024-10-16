@@ -23,6 +23,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\UsesClass;
 use Symfony\Component\Serializer\Exception\ExtraAttributesException;
 use Symfony\Component\Serializer\Exception\MissingConstructorArgumentsException;
+use Symfony\Component\String\ByteString;
 use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 use Throwable;
@@ -84,6 +85,10 @@ final class ValidatedEdibleFactoryTest extends KernelTestCase
             ],
             'name is blank' => [
                 self::edibleData(name: ''),
+                ValidationFailedException::class,
+            ],
+            'name is longer than 255 characters' => [
+                self::edibleData(name: ByteString::fromRandom(256)->toString()),
                 ValidationFailedException::class,
             ],
             'type is missing' => [

@@ -13,6 +13,7 @@ use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\String\ByteString;
 
 /**
  * @mixin KernelTestCase
@@ -63,6 +64,9 @@ trait TestsEdibleCreationEndpoint
             ],
             'name is blank' => [
                 self::edibleData(name: ''),
+            ],
+            'name is longer than 255 characters' => [
+                self::edibleData(name: ByteString::fromRandom(256)->toString()),
             ],
             'type is missing' => [
                 array_diff_key(

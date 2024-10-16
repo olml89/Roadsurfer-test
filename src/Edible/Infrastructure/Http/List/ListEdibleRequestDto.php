@@ -24,7 +24,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 final readonly class ListEdibleRequestDto
 {
     public function __construct(
-        #[Assert\Type('string')]
+        #[Assert\Length(min: 1, max: 255)]
         public ?string $name = null,
 
         #[Assert\Choice([

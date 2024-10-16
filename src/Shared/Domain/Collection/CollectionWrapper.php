@@ -6,9 +6,10 @@ namespace App\Shared\Domain\Collection;
 
 use Closure;
 
-
 /**
- * @template T
+ * https://phpstan.org/blog/whats-up-with-template-covariant
+ *
+ * @template-covariant T
  */
 abstract class CollectionWrapper
 {
