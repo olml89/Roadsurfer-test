@@ -12,6 +12,137 @@ This is an implementation of a technical test for a senior developer role at
 You can find the original repository this test is based on here:
 [https://github.com/tturkowski/fruits-and-vegetables](https://github.com/tturkowski/fruits-and-vegetables).
 
+# Implementation details
+
+This application can store and show lists of edibles separated into two different collections: fruits and vegetables.
+(Technical detail: although the edibles are only distinct because of their type, I have decided to consider them as
+different entities because in the future they could evolve to have different behaviours,
+I wanted to illustrate how I would make room for this from an architectural standpoint: they share a common Doctrine
+superclass but they are two full-fledged entities stored in different tables).
+
+## Store edibles
+
+### Add edibles through a JSON request
+
+An endpoint has been created for each edible entity:
+
+```php
+POST /fruits
+POST /vegetables
+```
+
+The endpoints expect this request payload:
+
+```json
+{
+  "id": (int),
+  "name": (name),
+  "quantity": (int|float),
+  "unit": "kg"|"g"
+}
+```
+When a new edible is created, a 201 Created HTTP response will be returned outputting the new created entity.
+<br>
+<br>
+The endpoints will do validation on the incoming payload: the id has to be positive, the name cannot be longer than 
+255 characters, the quantity has to be positive, and the unit has to be a valid unit. No attributes can be missing,
+and no extra attributes will be accepted. 
+<br>
+<br>
+If the validation fails, a 422 Unprocessable Entity HTTP response will be returned.
+<br>
+<br>
+As it was intended in the initial design, the id of the edibles is provided from the outside. That means that
+whoever is in charge of storing the edibles must know if the edibles already exist or not. If they do, a
+409 Conflict HTTP response will be returned.
+
+### Import edibles from a JSON feed
+
+A Symfony command has been created to import all the edibles from a specified json feed:
+
+```php
+./bin/console app:edible:import {fileLocation}
+```
+
+The importer will check than a file with a valid json feed exists in the specified location. Then it will try to
+parse its items and convert them into valid edibles in order to store them. The same validation rules will be
+run on the incoming input.
+
+## List edibles
+
+And endpoint has been created for each edible entity:
+
+```php
+GET /fruits
+GET /vegetables
+```
+
+They will return a 200 OK HTTP response outputting the requested collection. The endpoints have filtering capabilites 
+using the following concepts:
+
+```
+name: It will try to check if an entity matches partially with it. The comparison will not be case-sensitive.
+quantity: It will try to check if an entity matches the comparison with a specified quantity.
+```
+Those concepts can be combined, requiring both to be valid or only one of them. They are expressed through a query string. 
+An example of a query string would be:
+
+```php
+GET /fruits?name=B&op=and&quantity[amount]=1.5&quantity[op]=gte&quantity[unit]=kg
+```
+
+This request will match all the fruits that contain **B** or **b** in the name, and that have a quantity greater
+or equal than 1.5 kg.
+<br>
+<br>
+If the name is empty, the name comparison will not be taken into account.
+If the quantity amount is not specified, the quantity comparison will not be taken into consideration.
+<br>
+<br>
+Validation will be run on the incoming filters: the name can't be longer than 255 characters, and the operators to
+join the filters and perform the quantity comparison have to be valid. If there is some validation error
+a 400 Bad Request HTTP response will be returned.
+<br>
+<br>
+Valid joining operators:
+
+```php
+and
+or
+```
+
+Valid quantity comparison operators:
+
+```php
+eq (=)
+neq (!=)
+lt (<)
+lte (<=)
+gt (>)
+gte (>=)
+in (a value is contained in a list of values)
+nin (a value is not contained in a list of values)
+```
+
+To provide a list of values for the comparisons that need them (**in**, **nin**), different quantity amounts can be specified
+separating them by a comma:
+
+```php
+GET /fruits?quantity[amount]=1,2,3&quantity[op]=in&quantity[unit]=kg
+```
+
+## Showcasing of the results
+
+The edible creating edibles will output a single edible, and the edible listing endpoints will output a collection
+of edibles. The desired unit in which all the edibles will be returned can be specified through another query string parameter:
+
+```php
+GET /fruits?unit=kg
+```
+
+Validation will be also run on that query string parameter, so only a valid unit (**g** or **kg**) can be specified.
+
+
 # 🍎🥕 Fruits and Vegetables
 
 ## 🎯 Goal
